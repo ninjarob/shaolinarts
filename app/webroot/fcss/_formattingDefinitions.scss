@@ -1,0 +1,45 @@
+// Formatting Definitions
+html {font-size: $fontSize * 1; font-weight: normal;}
+body {font-size: $fontSize * 1; font-weight: normal;}
+span {font-size: $fontSize * 1; font-weight: normal;}
+h1 {font-size: $fontSize * 2; font-weight: bold;}
+h2 {font-size: $fontSize * 1.8; font-weight: bold;}
+h3 {font-size: $fontSize * 1.6; font-weight: bold;}
+h4 {font-size: $fontSize * 1.4; font-weight: bold;}
+h5 {font-size: $fontSize * 1.2; font-weight: bold;}
+h6 {font-size: $fontSize * 1; font-weight: bold;}
+p { line-height: $fontSize * 1.6;}
+blockquote {font-size: $fontSize * 1; font-weight: normal;}
+a {font-size: $fontSize * 1; font-weight: normal;}
+abbr {font-size: $fontSize * 1; font-weight: normal;}
+acronym {font-size: $fontSize * 1; font-weight: normal;}
+address {font-size: $fontSize * 1; font-weight: normal;}
+big {font-size: $fontSize * 1; font-weight: normal;}
+cite {font-size: $fontSize * 1; font-weight: normal;}
+code {font-size: $fontSize * 1; font-weight: normal;}
+del {font-size: $fontSize * 1; font-weight: normal;}
+// em {font-size: $fontSize * 1; font-weight: normal; }
+q {font-size: $fontSize * 1; font-weight: normal;}
+samp {font-size: $fontSize * 1; font-weight: normal;}
+small {font-size: $fontSize * 0.85; font-weight: normal;}
+strike {font-size: $fontSize * 1; font-weight: normal;}
+strong {font-size: $fontSize * 1; font-weight: normal;}
+sub {font-size: $fontSize * 1; font-weight: normal;}
+sup {font-size: $fontSize * 1; font-weight: normal;}
+b {font-size: $fontSize * 1; font-weight: normal;}
+u {font-size: $fontSize * 1; font-weight: normal;}
+i {font-size: $fontSize * 1; font-weight: normal;}
+center {font-size: $fontSize * 1; font-weight: normal;}
+label {font-size: $fontSize * 1; font-weight: normal;}
+legend {font-size: $fontSize * 1; font-weight: normal;}
+caption {font-size: $fontSize * 1; font-weight: normal;}
+article {font-size: $fontSize * 1; font-weight: normal;}
+aside {font-size: $fontSize * 1; font-weight: normal;}
+footer {font-size: $fontSize * 1; font-weight: normal;}
+header {font-size: $fontSize * 1; font-weight: normal;}
+menu {font-size: $fontSize * 1; font-weight: normal;}
+nav {font-size: $fontSize * 1; font-weight: normal;}
+section {font-size: $fontSize * 1; font-weight: normal;}
+strong{font-weight: bold;}
+
+img{ margin: 10px auto; padding: 3px; background-color: $white; border: $color2 solid 1px; max-width: 100%; max-height: 100%;}

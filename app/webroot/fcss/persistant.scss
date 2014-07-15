@@ -1,0 +1,95 @@
+// @import 'reset';
+@import 'mixins';
+@import 'bootstrap.min.css';
+@import 'variableDefinitions';
+@import 'formattingDefinitions';
+
+
+
+//Common Class Definition
+
+.sectionStyle{
+	@include roundcorners(8px);
+	@include box-shadow(0, 0, 10px, lighten( $black, 80% ), $inset: false);
+	background-color: $black;
+	border: darken( $white, 15% ) solid 3px;
+}
+
+//Container Customization
+
+.container{}
+
+//Header Customization
+
+header{
+	@extend .sectionStyle;
+	margin: 10px 0;
+	text-align: center;
+	img{
+		border: none;
+		padding: none;
+		background-color: transparent;
+	}
+}
+
+//NavBar Customization
+
+.navbar-inverse{
+	@extend .sectionStyle;
+	color: $white;
+}
+
+.navbar .container { height: 15px; }
+
+.navbar-nav > li > a {padding-top:10px !important; padding-bottom:5px !important; font-size: $fontSize * 1.1 !important;}
+.navbar {min-height:45px !important}
+
+//SideBar Customization
+
+.asideColumn, .sectionContent {
+	padding: 0 !important;
+}
+
+aside{
+	@extend .sectionStyle;
+	color: $white;
+	padding: 10%;
+	margin: 0 20px 0 0;
+	text-align: center;
+	p{
+		font-size: $fontSize * 0.8;
+		line-height: $fontSize * 1.2;
+		font-weight: normal;
+		padding: 7px 0;
+		text-align: justify;
+
+		em{
+			color: $color4;
+		}
+	}
+	h2, h3, h4, h5, h6{
+		color: $color4;
+	}
+	img{ margin: 10px auto; background-color: transparent; border: none;}
+
+}
+
+//Content Customization
+
+section{
+	@extend .sectionStyle;
+	background-color: $gray;
+	padding:20px 3%;
+	margin: 0 5px;
+    	background-color:#efefef;
+}
+
+//Footer Customization
+
+footer{
+	text-align: center;
+	p{
+		margin-top: 20px;
+		font-weight: bold;
+	}
+}
