@@ -1,3 +1,1 @@
-        <header>
-          <img src="img/logoanimbk.gif" alt="heading logo" />
-        </header>
+<header>    <?php echo $this->Html->image('logoanimbk.gif', array('alt'=>'heading logo')) ?></header>
