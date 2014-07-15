@@ -1,6 +1,6 @@
 <div class="row corpus">
     <div class="col-md-3 asideColumn hidden-xs hidden-sm">
-        <section class="contentCol cms-editable" id="mainContent">
+        <aside class="contentCol">
             <h2>Upcoming Events</h2>
             <h4>Utah</h4>
 
@@ -21,7 +21,7 @@
             <p><strong>Rank Review</strong><br/> March 22nd</p>
 
             <p><strong>Rank Review</strong><br/> June 28th</p>
-        </section>
+        </aside>
     </div>
     <div class="col-md-9 sectionContent">
         <section class="contentCol cms-editable" id="secondaryContent">
