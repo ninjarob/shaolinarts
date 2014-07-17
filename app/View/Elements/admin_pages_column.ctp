@@ -1,2 +1,1 @@
-		<img src="img/chuanfa.gif" alt="Chuan Fa">
-		<img src="img/Chen-Tai-Chi-Chuan-Gold.gif" alt="Tai Chi">
+<?php echo $this->Html->image('chuanfa.gif', array('alt'=>'Chuan Fa')) ?><?php echo $this->Html->image('Chen-Tai-Chi-Chuan-Gold.gif', array('alt'=>'Tai Chi')) ?>

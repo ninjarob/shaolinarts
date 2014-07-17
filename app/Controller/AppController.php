@@ -32,13 +32,34 @@ App::uses('Controller', 'Controller');
  */
 class AppController extends Controller {
 
-    var $components = array ('Auth', 'Acl', 'Session');
+    public $components = array(
+        'Session',
+        'Auth' => array(
+            'loginRedirect' => array(
+                'controller' => 'posts',
+                'action' => 'index'
+            ),
+            'logoutRedirect' => array(
+                'controller' => 'pages',
+                'action' => 'display',
+                'home'
+            ),
+            'authorize' => array('Controller')
+        )
+    );
 
-    function beforeFilter() {
-        $this->set('authUser', $this->Auth->user());
-        $this->set('acl', $this->Acl);
-        //debug($this->Auth->user());
-        $this->Auth->allow('display', 'login', 'logout', 'index', 'view');
+    public function isAuthorized($user) {
+        // Admin can access every action
+        if (isset($user['role']) && $user['role'] === 'admin') {
+            return true;
+        }
+
+        // Default deny
+        return false;
+}
+
+    public function beforeFilter() {
+        $this->Auth->allow('index', 'view');
+        //$this->set('authUser', $this->Auth->user());
     }
-
 }
