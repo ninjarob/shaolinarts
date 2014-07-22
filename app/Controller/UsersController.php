@@ -1,7 +1,6 @@
 <?php
 App::uses('AppController', 'Controller');
 class UsersController extends AppController {
-
     public $paginate = array(
         'limit' => 25,
         'conditions' => array('status' => '1'),
@@ -10,25 +9,31 @@ class UsersController extends AppController {
 
     public function beforeFilter() {
         parent::beforeFilter();
-        $this->Auth->allow('login','add','logout','manage');
+        $this->Auth->allow('login','add','logout');
+        $this->layout = 'user';
     }
 
-
+    public function isAuthorized($user) {
+       if (isset($user['role_id']) && $user['role_id'] >=0) {
+            if (in_array($this->action, array('user_home', 'change_info', 'learn', 'play', 'train'))) {
+                return true;
+            }
+       }
+       return parent::isAuthorized($user);
+    }
 
     public function login() {
-
         //if already logged-in, redirect
         if($this->Session->check('Auth.User')){
             $this->redirect(array('action' => 'index'));
         }
-        echo(serialize($this->data));
         // if we get the post information, try to authenticate
         if ($this->request->is('post')) {
             if ($this->Auth->login()) {
-                $this->Session->setFlash(__('Welcome, '. $this->Auth->user('username')));
+                $this->Session->setFlash(__('Welcome, '. $this->Auth->user('email')));
                 $this->redirect($this->Auth->redirectUrl());
             } else {
-                $this->Session->setFlash(__('Invalid username or password'));
+                $this->Session->setFlash(__('Invalid email or password'));
             }
         }
     }
@@ -46,16 +51,40 @@ class UsersController extends AppController {
         $this->set(compact('users'));
     }
 
+    public function user_home() {}
+    public function change_info() {}
+    public function learn() {}
+    public function play() {}
+    public function train() {}
 
     public function add() {
-        if ($this->request->is('post')) {
+        $roleData = $this->User->Role->find('list', array('fields' => array('id', 'name'),'order'=>'id ASC'));
+        $kungFuRank = $this->User->KungFuRank->find('list', array('fields' => array('id', 'name'),'order'=>'id ASC'));
+        $taiChiRank = $this->User->TaiChiRank->find('list', array('fields' => array('id', 'name'),'order'=>'id ASC'));
+        $this->set('roles', $roleData);
+        $this->set('kfrs', $kungFuRank);
+        $this->set('tcrs', $taiChiRank);
 
+        if ($this->request->is('post')) {
             $this->User->create();
-            if ($this->User->save($this->request->data)) {
+            if (in_array('KungFuRank', $this->request->data) && "0" === $this->request->data['KungFuRank']['id']) {
+                $this->request->data['KungFuRank'] = null;
+            }
+            if (in_array('TaiChiRank', $this->request->data) && "0" === $this->request->data['TaiChiRank']['id']) {
+                $this->request->data['TaiChiRank'] = null;
+            }
+            if ($this->User->saveAll($this->request->data)) {
                 $this->Session->setFlash(__('The user has been created'));
-                $this->redirect(array('action' => 'add'));
+                if($this->Session->check('Auth.User')){
+                    $this->redirect(array('action' => 'add'));
+                }
+                else {
+                    $this->redirect(array('action' => 'login'));
+                }
             } else {
                 $this->Session->setFlash(__('The user could not be created. Please, try again.'));
+                //$this->redirect(array('action' => 'add'));
+                $this->log(print_r($this->User->validationErrors, true));
             }
         }
     }

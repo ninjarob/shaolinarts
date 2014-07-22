@@ -3,29 +3,34 @@ App::uses('AuthComponent', 'Controller/Component');
 
 class User extends AppModel {
 
-    public $avatarUploadDir = 'img/avatars';
+    var $belongsTo = array('Role','KungFuRank','TaiChiRank');
+    var $hasOne = 'UserInfo';
 
     public $validate = array(
-        'username' => array(
-            'nonEmpty' => array(
-                'rule' => array('notEmpty'),
-                'message' => 'A username is required',
-                'allowEmpty' => false
-            ),
-            'between' => array(
-                'rule' => array('between', 5, 15),
-                'required' => true,
-                'message' => 'Usernames must be between 5 to 15 characters'
+        'email' => array(
+            'required' => array(
+                'rule' => array('email', true),
+                'message' => 'Please provide a valid email address.'
             ),
              'unique' => array(
-                'rule'    => array('isUniqueUsername'),
-                'message' => 'This username is already in use'
+                'rule'    => array('isUniqueEmail'),
+                'message' => 'This email is already in use',
             ),
-            'alphaNumericDashUnderscore' => array(
-                'rule'    => array('alphaNumericDashUnderscore'),
-                'message' => 'Username can only be letters, numbers and underscores'
-            ),
+            'between' => array(
+                'rule' => array('between', 6, 60),
+                'message' => 'Email Addresses must be between 6 to 100 characters'
+            )
         ),
+        'email_confirm' => array(
+                    'required' => array(
+                        'rule' => array('notEmpty'),
+                        'message' => 'Please confirm your email'
+                    ),
+                     'equaltofield' => array(
+                        'rule' => array('equaltofield','email'),
+                        'message' => 'Both emails must match.'
+                    )
+                ),
         'password' => array(
             'required' => array(
                 'rule' => array('notEmpty'),
@@ -47,30 +52,12 @@ class User extends AppModel {
                 'message' => 'Both passwords must match.'
             )
         ),
-
-        'email' => array(
-            'required' => array(
-                'rule' => array('email', true),
-                'message' => 'Please provide a valid email address.'
-            ),
-             'unique' => array(
-                'rule'    => array('isUniqueEmail'),
-                'message' => 'This email is already in use',
-            ),
-            'between' => array(
-                'rule' => array('between', 6, 60),
-                'message' => 'Usernames must be between 6 to 60 characters'
-            )
-        ),
         'role' => array(
             'valid' => array(
-                'rule' => array('inList', array('king', 'queen', 'bishop', 'rook', 'knight', 'pawn')),
                 'message' => 'Please enter a valid role',
                 'allowEmpty' => false
             )
         ),
-
-
         'password_update' => array(
             'min_length' => array(
                 'rule' => array('minLength', '6'),
@@ -141,7 +128,7 @@ class User extends AppModel {
         );
 
         if(!empty($email)){
-            if($this->data[$this->alias]['id'] == $email['User']['id']){
+            if(in_array('id', $this->data['User']) && $this->data['User']['id'] == $email['User']['id']){
                 return true;
             }else{
                 return false;

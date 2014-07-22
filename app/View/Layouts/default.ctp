@@ -19,14 +19,13 @@
     ?>
 </head>
 <body>
-<?php echo $this->Session->flash('auth'); ?>
-<?php echo $this->Session->flash(); ?>
 <div class="container">
     <div class="row header">
 
         <?php echo $this->element('banner'); ?>
         <?php echo $this->element('navigation'); ?>
-
+        <?php echo $this->Session->flash('auth'); ?>
+        <?php echo $this->Session->flash(); ?>
         <?php echo $this->fetch('content'); ?>
 
         <div class="row footer">
