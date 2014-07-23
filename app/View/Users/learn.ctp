@@ -4,7 +4,7 @@ Here are the manuals you currently have available for your current rank and inte
 <p>Kung Fu Manual (Your Kung Fu rank is currently "<?php echo (AuthComponent::user('KungFuRank')['name']) ?>").</p>
 <ul class="list-group">
     <li class="input-group list-group-item">
-        <?php echo $this->Html->link('Train', '/users/train') ?>
+        <?php echo $this->Html->link('The One Manual', '/manuals/show/2', array('target' => '_blank')) ?>
     </li>
 </ul>
 <?php } ?>

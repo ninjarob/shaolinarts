@@ -14,7 +14,7 @@
     </li>
     <?php if (AuthComponent::user('Role')['name'] === 'Admin') {  ?>
     <li class="input-group list-group-item">
-        <?php echo $this->Html->link('Admin', '/users/admin') ?>
+        <?php echo $this->Html->link('Admin', '/admin_pages/admin_home') ?>
     </li>
     <?php } ?>
 </ul>

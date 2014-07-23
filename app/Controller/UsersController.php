@@ -19,6 +19,11 @@ class UsersController extends AppController {
                 return true;
             }
        }
+       if (isset($user['role_id']) && $user['role_id'] >=6) {
+           if (in_array($this->action, array('user_management', 'edit', 'delete'))) {
+               return true;
+           }
+      }
        return parent::isAuthorized($user);
     }
 
@@ -42,7 +47,8 @@ class UsersController extends AppController {
         $this->redirect($this->Auth->logout());
     }
 
-    public function manage() {
+    public function user_management() {
+
         $this->paginate = array(
             'limit' => 6,
             'order' => array('User.username' => 'asc' )
