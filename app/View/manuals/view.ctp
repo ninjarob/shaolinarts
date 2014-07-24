@@ -1,0 +1,1 @@
+<?php echo '<img src="/manuals/show/'.$manualId.'" title="This is a related file to a project" />';?>
