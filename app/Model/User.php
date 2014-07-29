@@ -3,7 +3,7 @@ App::uses('AuthComponent', 'Controller/Component');
 
 class User extends AppModel {
 
-    var $belongsTo = array('Role','KungFuRank','TaiChiRank');
+    var $belongsTo = array('Role','KungFuRank','TaiChiRank','Studio');
     var $hasOne = 'UserInfo';
 
     public $validate = array(

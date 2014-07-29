@@ -401,7 +401,6 @@ class AuthComponent extends Component {
 		if ($this->unauthorizedRedirect === false) {
 			throw new ForbiddenException($this->authError);
 		}
-
 		$this->flash($this->authError);
 		if ($this->unauthorizedRedirect === true) {
 			$default = '/';

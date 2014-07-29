@@ -50,7 +50,7 @@ class UsersController extends AppController {
     public function user_management() {
 
         $this->paginate = array(
-            'limit' => 6,
+            'limit' => 10,
             'order' => array('User.username' => 'asc' )
         );
         $users = $this->paginate('User');
@@ -65,11 +65,13 @@ class UsersController extends AppController {
 
     public function add() {
         $roleData = $this->User->Role->find('list', array('fields' => array('id', 'name'),'order'=>'id ASC'));
+        $studioData = $this->User->Studio->find('list', array('fields' => array('id', 'name'),'order'=>'id ASC'));
         $kungFuRank = $this->User->KungFuRank->find('list', array('fields' => array('id', 'name'),'order'=>'id ASC'));
         $taiChiRank = $this->User->TaiChiRank->find('list', array('fields' => array('id', 'name'),'order'=>'id ASC'));
         $this->set('roles', $roleData);
         $this->set('kfrs', $kungFuRank);
         $this->set('tcrs', $taiChiRank);
+        $this->set('studios', $studioData);
 
         if ($this->request->is('post')) {
             $this->User->create();
@@ -89,8 +91,6 @@ class UsersController extends AppController {
                 }
             } else {
                 $this->Session->setFlash(__('The user could not be created. Please, try again.'));
-                //$this->redirect(array('action' => 'add'));
-                $this->log(print_r($this->User->validationErrors, true));
             }
         }
     }

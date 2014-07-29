@@ -37,6 +37,10 @@
             <?php echo $this->Form->input('Role.id', array('options' => $roles, 'label'=>'')); ?>
         </li>
         <li class="input-group list-group-item">
+            <label class="login_label">Studio:</label>
+            <?php echo $this->Form->input('Studio.id', array('options' => $studios, 'label'=>'')); ?>
+        </li>
+        <li class="input-group list-group-item">
             <label class="login_label">Kung Fu Rank:</label>
             <?php echo $this->Form->input('KungFuRank.id',  array('options' => $kfrs, 'label'=>'','empty' => array(0 => ''))); ?>
         </li>

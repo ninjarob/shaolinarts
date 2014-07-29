@@ -66,5 +66,55 @@ class AppController extends Controller {
 
     public function beforeFilter() {
         $this->Auth->allow('index', 'view');
+        $this->__checkSSL();
     }
+
+    public $secureControllers = array('users','adminPages');
+
+    /**
+     * Check SSL connection.
+     */
+    function __checkSSL() {
+        /** Make sure we are secure when we need to be! **/
+        if (!empty($this->loggedUser)) {
+            if (in_array($this->params['controller'], $this->secureControllers) && !env('HTTPS')) {
+                $this->__forceSSL();
+            }
+
+            if (!in_array($this->params['controller'], $this->secureControllers) && env('HTTPS')) {
+                $this->__unforceSSL();
+            }
+        } else {
+            // Always force HTTPS if user is logged in.
+            if (!env('HTTPS')) {
+                $this->__forceSSL();
+            }
+        }
+    }
+
+    /**
+     * Redirect to a secure connection
+     * @return unknown_type
+     */
+    function __forceSSL() {
+       // if (strstr(env('SERVER_NAME'), 'www.')) {
+            $this->redirect('https://' . env('SERVER_NAME') . $this->here);
+        //} else {
+         //   $this->redirect('https://www.' . env('SERVER_NAME') . $this->here);
+        //}
+    }
+
+    /**
+     * Redirect to an unsecure connection
+     * @return unknown_type
+     */
+    function __unforceSSL() {
+        //if (strstr(env('SERVER_NAME'), 'www.')) {
+           // $server = substr(env('SERVER_NAME'), 4);
+            $this->redirect('http://' . env('SERVER_NAME') . $this->here);
+        //} else {
+       //     $this->redirect('http://' . env('SERVER_NAME') . $this->here);
+        //}
+    }
+
 }
