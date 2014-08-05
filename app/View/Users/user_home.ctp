@@ -12,7 +12,7 @@
     <li class="input-group list-group-item">
         <?php echo $this->Html->link('Change Info', '/users/change_info') ?>
     </li>
-    <?php if (AuthComponent::user('Role')['name'] === 'Admin') {  ?>
+    <?php if ($this->User->isManager(AuthComponent::user('id'))) {  ?>
     <li class="input-group list-group-item">
         <?php echo $this->Html->link('Admin', '/admin_pages/admin_home') ?>
     </li>

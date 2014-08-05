@@ -40,14 +40,6 @@
             <label class="login_label">Studio:</label>
             <?php echo $this->Form->input('Studio.id', array('options' => $studios, 'label'=>'')); ?>
         </li>
-        <li class="input-group list-group-item">
-            <label class="login_label">Kung Fu Rank:</label>
-            <?php echo $this->Form->input('KungFuRank.id',  array('options' => $kfrs, 'label'=>'','empty' => array(0 => ''))); ?>
-        </li>
-        <li class="input-group list-group-item">
-            <label class="login_label">Tai Chi Rank:</label>
-            <?php echo $this->Form->input('TaiChiRank.id',  array('options' => $tcrs, 'label'=>'','empty' => array(0 => ''))); ?>
-        </li>
     <?php }
     echo $this->Form->submit('Add User', array('class' => 'form-submit', 'title' => 'Click here to add the user'));
     ?>

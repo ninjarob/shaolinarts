@@ -1,10 +1,12 @@
 <?php
 App::uses('AppController', 'Controller');
 class UsersController extends AppController {
+    public $uses = array('User', 'Role', 'Studio', 'UserRoleStudio');
+    public $helpers = array('User');
     public $paginate = array(
         'limit' => 25,
-        'conditions' => array('status' => '1'),
-        'order' => array('User.username' => 'asc' )
+            'conditions' => array('status' => '1'),
+            'order' => array('User.email' => 'asc' )
     );
 
     public function beforeFilter() {
@@ -14,29 +16,40 @@ class UsersController extends AppController {
     }
 
     public function isAuthorized($user) {
-       if (isset($user['role_id']) && $user['role_id'] >=0) {
+        $userRoleStudio = $this->UserRoleStudio->find('first', array('conditions'=>array('user_id'=>$user['id'])));
+        if (count($userRoleStudio)>0) {
             if (in_array($this->action, array('user_home', 'change_info', 'learn', 'play', 'train'))) {
                 return true;
             }
-       }
-       if (isset($user['role_id']) && $user['role_id'] >=6) {
-           if (in_array($this->action, array('user_management', 'edit', 'delete'))) {
-               return true;
-           }
-      }
-       return parent::isAuthorized($user);
+            if (in_array($this->action, array('user_management', 'edit', 'delete'))) {
+                $userRoleStudio = $this->UserRoleStudio->find('first', array('conditions'=>array('user_id'=>$user['id'], 'role_id in'=>array(1, 2, 3, 4, 5))));
+                if (count($userRoleStudio)>0) {
+                    return true;
+                }
+            }
+        }
+        return parent::isAuthorized($user);
     }
 
     public function login() {
         //if already logged-in, redirect
         if($this->Session->check('Auth.User')){
-            $this->redirect(array('action' => 'index'));
+            $this->redirect(array('action' => 'user_home'));
         }
         // if we get the post information, try to authenticate
         if ($this->request->is('post')) {
             if ($this->Auth->login()) {
-                $this->Session->setFlash(__('Welcome, '. $this->Auth->user('email')));
-                $this->redirect($this->Auth->redirectUrl());
+                $userRoleStudio = $this->UserRoleStudio->find('first', array('conditions'=>array('user_id'=>$this->Auth->user('id'))));
+                //if they have any roles, send them to the welcome
+                if (count($userRoleStudio)>0) {
+                    $this->Session->setFlash(__('Welcome, '. $this->Auth->user('email')));
+                    $this->redirect($this->Auth->redirectUrl());
+                }
+                //otherwise log them back out.  They've got to have roles first.
+                else {
+                    $this->Session->setFlash(__('There was a problem processing your login.  You may not yet have rights to access the ShaolinArts user pages'));
+                    $this->redirect(array('action' => 'logout'));
+                }
             } else {
                 $this->Session->setFlash(__('Invalid email or password'));
             }
@@ -50,8 +63,8 @@ class UsersController extends AppController {
     public function user_management() {
 
         $this->paginate = array(
-            'limit' => 10,
-            'order' => array('User.username' => 'asc' )
+            'limit' => 25,
+            'order' => array('UserInfo.fname' => 'asc' )
         );
         $users = $this->paginate('User');
         $this->set(compact('users'));
@@ -64,13 +77,9 @@ class UsersController extends AppController {
     public function train() {}
 
     public function add() {
-        $roleData = $this->User->Role->find('list', array('fields' => array('id', 'name'),'order'=>'id ASC'));
-        $studioData = $this->User->Studio->find('list', array('fields' => array('id', 'name'),'order'=>'id ASC'));
-        $kungFuRank = $this->User->KungFuRank->find('list', array('fields' => array('id', 'name'),'order'=>'id ASC'));
-        $taiChiRank = $this->User->TaiChiRank->find('list', array('fields' => array('id', 'name'),'order'=>'id ASC'));
+        $roleData = $this->Role->find('list', array('fields' => array('id', 'name'),'order'=>'id ASC'));
+        $studioData = $this->Studio->find('list', array('fields' => array('id', 'name'),'order'=>'id ASC'));
         $this->set('roles', $roleData);
-        $this->set('kfrs', $kungFuRank);
-        $this->set('tcrs', $taiChiRank);
         $this->set('studios', $studioData);
 
         if ($this->request->is('post')) {
