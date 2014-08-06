@@ -61,6 +61,10 @@ class UsersController extends AppController {
     }
 
     public function user_management() {
+        $roleData = $this->Role->find('list', array('fields' => array('id', 'name'),'order'=>'id ASC'));
+        $studioData = $this->Studio->find('list', array('fields' => array('id', 'name'),'order'=>'id ASC'));
+        $this->set('roles', $roleData);
+        $this->set('studios', $studioData);
 
         $this->paginate = array(
             'limit' => 25,
