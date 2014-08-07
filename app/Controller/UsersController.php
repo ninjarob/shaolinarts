@@ -22,7 +22,7 @@ class UsersController extends AppController {
                 return true;
             }
             if (in_array($this->action, array('user_management', 'edit', 'delete'))) {
-                $userRoleStudio = $this->UserRoleStudio->find('first', array('conditions'=>array('user_id'=>$user['id'], 'role_id in'=>array(1, 2, 3, 4, 5))));
+                $userRoleStudio = $this->UserRoleStudio->find('first', array('conditions'=>array('user_id'=>$user['id'], 'role_id in'=>array(1, 3, 4, 5))));
                 if (count($userRoleStudio)>0) {
                     return true;
                 }
@@ -65,10 +65,24 @@ class UsersController extends AppController {
         $studioData = $this->Studio->find('list', array('fields' => array('id', 'name'),'order'=>'id ASC'));
         $this->set('roles', $roleData);
         $this->set('studios', $studioData);
-
+        $loggedInUserURS = $this->UserRoleStudio->find('all', array('conditions'=>array('user_id'=>$this->Auth->user('id'))));
+        $this->User->Behaviors->load('Containable');
         $this->paginate = array(
             'limit' => 25,
-            'order' => array('UserInfo.fname' => 'asc' )
+            'joins' =>  array(
+                array(
+                  'table' => 'user_role_studios',
+                  'alias' => 'UserRoleStudio',
+                  'type' => 'left',
+                  'conditions' => array(
+                      'UserRoleStudio.user_id = User.id'
+                   )
+                 )
+             ),
+            'contain' => array('UserRoleStudio','UserInfo'),
+            'order' => array('UserInfo.fname' => 'asc' ),
+            'group' => 'User.id',
+            'conditions' => array('UserRoleStudio.studio_id in ('.$this->getStudioViewRights($loggedInUserURS).')')
         );
         $users = $this->paginate('User');
         $this->set(compact('users'));
@@ -174,6 +188,23 @@ class UsersController extends AppController {
         }
         $this->Session->setFlash(__('User was not re-activated'));
         $this->redirect(array('action' => 'index'));
+    }
+
+    private function getStudioViewRights($userRoleStudios) {
+        $studios = "";
+        if (count($userRoleStudios) >= 1) {
+            foreach ($userRoleStudios as $urs) {
+                //catch admin
+                if ($urs['UserRoleStudio']['role_id'] == 5) return "1,2,3";
+                $studios = $studios.$urs['UserRoleStudio']['studio_id'].',';
+            }
+            $studios = rtrim($studios, ',');
+        }
+        else {
+            if ($userRoleStudios['UserRoleStudio']['role_id'] == 5) return "1,2,3";
+            $studios = $userRoleStudios['UserRoleStudio']['studio_id'];
+        }
+        return trim($studios);
     }
 
 }

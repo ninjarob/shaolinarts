@@ -11,7 +11,9 @@
             <th>Address</th>
             <th style="white-space: nowrap;">Spouse Guardian</th>
             <th>Birthday</th>
+            <?php if ($this->User->isManager(AuthComponent::user('id'))) {  ?>
             <th>Actions</th>
+            <?php } ?>
         </tr>
         </thead>
         <tbody>
@@ -68,6 +70,7 @@
             <td>
                 <div style="white-space: nowrap;"><?php echo $user['UserInfo']['birthdate']; ?></div>
             </td>
+            <?php if ($this->User->isManager(AuthComponent::user('id'))) {  ?>
             <td>
                 <div style="width:130px"><?php echo $this->Html->link( "Edit", array('action'=>'edit', $user['User']['id']) ); ?> |
                 <?php
@@ -78,6 +81,7 @@
                 }
                 ?></div>
             </td>
+            <?php } ?>
         </tr>
         <?php endforeach; ?>
         <?php unset($user); ?>

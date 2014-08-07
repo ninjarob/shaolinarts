@@ -180,8 +180,22 @@ class User extends AppModel {
         return parent::beforeSave($options);
     }
 
-    public function isAdmin() {
+//    public function paginate($conditions, $fields, $order, $limit, $page = 1,
+//        $recursive = null, $extra = array()) {
+//
+//        $sql = 'select distinct(u.*, ui.*) from users u join user_infos ui on u.id = ui.user_id join user_role_studios urs on u.id = urs.user_id where '.
+//                    'urs.studio_id in ('.
+//                    $order;
+//
+//        $list = $this->find(
+//            'all', array('conditions'=>array(), 'limit'=>$limit, 'page'=>$page, 'order'=>$order)
+//        );
+//
+//        $this->log($list);
+//
+//        return $list;
+//    }
 
-    }
+
 }
 ?>
