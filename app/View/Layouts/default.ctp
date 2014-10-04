@@ -17,6 +17,20 @@
         echo $this->Html->script('bootstrap.min.js');
         echo $this->Html->script('bootstrap-datepicker.js');
     ?>
+    <script type="text/javascript">
+    function showEdit() {
+        $('.noEdit').hide();
+        $('.editable-content').show();
+    }
+    function hideEdit() {
+        $('.noEdit').show();
+        $('.editable-content').hide();
+    }
+    function submitAndClose() {
+        $('#ContentForPageEditForm').submit();
+        hideEdit();
+    }
+    </script>
 </head>
 <body>
 <div class="container">
@@ -26,7 +40,33 @@
         <?php echo $this->element('navigation'); ?>
         <?php echo $this->Session->flash('auth'); ?>
         <?php echo $this->Session->flash(); ?>
-        <?php echo $this->fetch('content'); ?>
+        <div class="row corpus">
+            <?php echo $this->Form->create('ContentForPage', array('action'=>'edit')); ?>
+            <?php echo $this->Form->hidden('id', array('value'=>$pageContentId)); ?>
+            <div class="col-md-3 asideColumn hidden-xs hidden-sm">
+                <section class="contentCol cms-editable editable-content" id="editContent" style="display:none;">
+                    <?php echo $this->Form->input('contentAside', array('type' => 'textarea', 'label'=>'', 'cols'=>'30', 'rows'=>'60', 'value'=>$pageContentAside, 'escape'=>false));?>
+                </section>
+                <aside class="contentCol noEdit">
+                    <?php echo($pageContentAside);?>
+                </aside>
+            </div>
+            <div class="col-md-9 sectionContent">
+                <?php if ($this->User->isAdmin(AuthComponent::user('id'))) {  ?>
+                <div style="position:absolute; right:20px;'">
+                    <?php echo $this->Html->link('Edit Content', '#', array('onclick'=>'showEdit()', 'class'=>'noEdit')) ?>
+                    <?php echo $this->Html->link('Save Content and Close', '#', array('onclick'=>'submitAndClose(); return false;', 'class'=>'editable-content', 'style'=>'display:none')) ?>
+                </div>
+                <section class="contentCol cms-editable editable-content" id="editContent" style="display:none;">
+                    <?php echo $this->Form->input('content', array('type' => 'textarea', 'label'=>'', 'cols'=>'100', 'rows'=>'180', 'value'=>$pageContent, 'escape'=>false));?>
+                </section>
+                <?php } ?>
+                <section class="contentCol cms-editable noEdit" id="mainContent">
+                    <?php echo($pageContent); ?>
+                </section>
+            </div>
+            <?php echo $this->Form->end(); ?>
+        </div>
 
         <div class="row footer">
             <div class="col-md-12">

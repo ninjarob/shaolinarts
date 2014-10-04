@@ -7,7 +7,7 @@ class PagesController extends AppController {
  *
  * @var array
  */
-	public $uses = array('Contact');
+	public $uses = array('Contact', 'ContentForPage');
     public $helpers = array('form');
 
     function beforeFilter() {
@@ -33,6 +33,10 @@ class PagesController extends AppController {
 		if (!empty($path[$count - 1])) {
 			$title_for_layout = Inflector::humanize($path[$count - 1]);
 		}
+        $pageContent = $this->ContentForPage->find('first', array('conditions'=>array('name'=>$path[0])));
+        $this->set('pageContent', $pageContent['ContentForPage']['content']);
+        $this->set('pageContentAside', $pageContent['ContentForPage']['contentAside']);
+        $this->set('pageContentId', $pageContent['ContentForPage']['id']);
 		$this->set(compact('page', 'subpage', 'title_for_layout'));
 
 		try {

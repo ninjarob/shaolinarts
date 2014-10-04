@@ -18,6 +18,7 @@ class UserHelper extends AppHelper {
     }
 
     private function isManagerForStudioRole($studioRole) {
+        if (!isset($studioRole['UserRoleStudio'])) return false;
         return ($studioRole['UserRoleStudio']['role_id'] <= 5 && $studioRole['UserRoleStudio']['role_id'] >= 3);
     }
 
@@ -38,5 +39,24 @@ class UserHelper extends AppHelper {
 
     private function isInstructorForStudioRole($studioRole) {
         return ($studioRole['UserRoleStudio']['role_id'] <= 5 && $studioRole['UserRoleStudio']['role_id'] != 2);
+    }
+
+    public function isAdmin($id) {
+        App::import("Model", "UserRoleStudio");
+        $model = new UserRoleStudio();
+        $userRoleStudios = $model->find("all", array('conditions'=>array('user_id'=>$id)));
+        if (count($userRoleStudios) >= 1) {
+            foreach ($userRoleStudios as $userRole) {
+                if ($this->isManagerForStudioRole($userRole)) return true;
+            }
+        }
+        else {
+            return $this->isManagerForStudioRole($userRoleStudios);
+        }
+        return false;
+    }
+
+    private function isAdminForStudioRole($studioRole) {
+        return ($studioRole['UserRoleStudio']['role_id'] == 5);
     }
 }

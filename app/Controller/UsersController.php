@@ -61,12 +61,35 @@ class UsersController extends AppController {
     }
 
     public function user_management() {
+
+        $fnameFilter = "";
+        $lnameFilter = "";
+        $mroleFilter = "";
+        $kfroleFilter = "";
+        $tcroleFilter = "";
+        $studioFilter = "";
+
+        if (isset($this->params['data']['User'])) {
+            $fnameFilter = $this->params['data']['User']['fnfilter'];
+            $lnameFilter = $this->params['data']['User']['lnfilter'];
+            $mroleFilter = $this->params['data']['User']['mrfilter'];
+            $kfroleFilter = $this->params['data']['User']['kfrfilter'];
+            $tcroleFilter = $this->params['data']['User']['tcrfilter'];
+            $studioFilter = $this->params['data']['User']['sfilter'];
+            $this->set('fnfilter', $fnameFilter);
+            $this->set('lnfilter', $lnameFilter);
+            $this->set('mrfilter', $mroleFilter);
+            $this->set('kfrfilter', $kfroleFilter);
+            $this->set('tcrfilter', $tcroleFilter);
+            $this->set('sfilter', $studioFilter);
+        }
+
         $roleData = $this->Role->find('list', array('fields' => array('id', 'name'),'order'=>'id ASC'));
         $studioData = $this->Studio->find('list', array('fields' => array('id', 'name'),'order'=>'id ASC'));
         $this->set('roles', $roleData);
         $this->set('studios', $studioData);
-        $loggedInUserURS = $this->UserRoleStudio->find('all', array('conditions'=>array('user_id'=>$this->Auth->user('id'))));
         $this->User->Behaviors->load('Containable');
+        $conditions = $this->setupConditions($fnameFilter, $lnameFilter, $mroleFilter, $kfroleFilter, $tcroleFilter, $studioFilter);
         $this->paginate = array(
             'limit' => 25,
             'joins' =>  array(
@@ -82,10 +105,34 @@ class UsersController extends AppController {
             'contain' => array('UserRoleStudio','UserInfo'),
             'order' => array('UserInfo.fname' => 'asc' ),
             'group' => 'User.id',
-            'conditions' => array('UserRoleStudio.studio_id in ('.$this->getStudioViewRights($loggedInUserURS).')')
+            'conditions' => $conditions
         );
         $users = $this->paginate('User');
         $this->set(compact('users'));
+    }
+
+    private function setupConditions($fnameFilter, $lnameFilter, $mroleFilter, $kfroleFilter, $tcroleFilter, $studioFilter) {
+        $loggedInUserURS = $this->UserRoleStudio->find('all', array('conditions'=>array('user_id'=>$this->Auth->user('id'))));
+        $conditions = array("UserRoleStudio.studio_id in (".$this->getStudioViewRights($loggedInUserURS).")");
+        if (!empty($fnameFilter)) {
+            $conditions[]="UserInfo.fname like '%".$fnameFilter."%'";
+        }
+        if (!empty($lnameFilter)) {
+            $conditions[]="UserInfo.lname like '%".$lnameFilter."%'";
+        }
+        if (!empty($mroleFilter)) {
+            $conditions[]="UserRoleStudio.role_id = ".$mroleFilter;
+        }
+        if (!empty($kfroleFilter)) {
+            $conditions[]="UserRoleStudio.role_id = ".$kfroleFilter;
+        }
+        if (!empty($tcroleFilter)) {
+            $conditions[]="UserRoleStudio.role_id = ".$tcroleFilter;
+        }
+        if (!empty($studioFilter)) {
+            $conditions[]="UserRoleStudio.studio_id = ".$studioFilter;
+        }
+        return $conditions;
     }
 
     public function user_home() {}
@@ -128,7 +175,6 @@ class UsersController extends AppController {
                 $this->Session->setFlash('Please provide a user id');
                 $this->redirect(array('action'=>'index'));
             }
-
             $user = $this->User->findById($id);
             if (!$user) {
                 $this->Session->setFlash('Invalid User ID Provided');
@@ -137,7 +183,10 @@ class UsersController extends AppController {
 
             if ($this->request->is('post') || $this->request->is('put')) {
                 $this->User->id = $id;
-                if ($this->User->save($this->request->data)) {
+                if ($user['User']['email'] == $this->request->data['User']['email']) {
+                    unset($this->request->data['User']['email']);
+                }
+                if ($this->User->saveAll($this->request->data)) {
                     $this->Session->setFlash(__('The user has been updated'));
                     $this->redirect(array('action' => 'edit', $id));
                 }else{
