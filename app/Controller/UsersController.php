@@ -52,6 +52,7 @@ class UsersController extends AppController {
                 }
             } else {
                 $this->Session->setFlash(__('Invalid email or password'));
+                $this->log($this->Auth->ValidationErrors());
             }
         }
     }
@@ -61,6 +62,7 @@ class UsersController extends AppController {
     }
 
     public function user_management() {
+        $this->layout = 'user_admin';
 
         $fnameFilter = "";
         $lnameFilter = "";

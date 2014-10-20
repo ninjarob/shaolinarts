@@ -1,7 +1,6 @@
 <div class="users form">
-    <h1>Users</h1>
-    <p>Search Filter</p>
-    <table id="hor-minimalist-b">
+    <h3>User Management</h3>
+    <table id="hor-minimalist-b" style="margin:0px;">
         <tr>
             <td style="white-space: nowrap;">First Name</td>
             <td style="white-space: nowrap;">Last Name</td>
@@ -19,11 +18,12 @@
             <td><?php echo $this->Form->input('kfrfilter', array('label'=>'', 'style'=>'font-size:8px; width:180px; height:20px;')); ?></td>
             <td><?php echo $this->Form->input('tcrfilter', array('label'=>'', 'style'=>'font-size:8px; width:180px; height:20px;')); ?></td>
             <td><?php echo $this->Form->input('sfilter', array('label'=>'', 'style'=>'font-size:8px; width:180px; height:20px;')); ?></td>
+            <td><?php echo $this->Form->button('Clear', array('type'=>'reset')); ?></td>
             <td><?php echo $this->Form->submit('Go!', array('div' => false,'class' => 'urclass', 'title' => 'Filter Results')); ?></td>
             <?php echo $this->Form->end(); ?>
         </tr>
     </table>
-
+    <br/>
     <table id="pattern-style-b">
         <thead>
         <tr>
