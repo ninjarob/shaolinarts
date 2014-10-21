@@ -12,3 +12,7 @@
 .users tr {
 
 }
+
+#new-role div.input.select {
+    float:left;
+}

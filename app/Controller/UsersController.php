@@ -144,6 +144,7 @@ class UsersController extends AppController {
     public function train() {}
 
     public function add() {
+        $this->layout = 'user_admin';
         $roleData = $this->Role->find('list', array('fields' => array('id', 'name'),'order'=>'id ASC'));
         $studioData = $this->Studio->find('list', array('fields' => array('id', 'name'),'order'=>'id ASC'));
         $this->set('roles', $roleData);
@@ -172,33 +173,39 @@ class UsersController extends AppController {
     }
 
     public function edit($id = null) {
+        $this->layout = 'user_admin';
+        if (!$id) {
+            $this->Session->setFlash('Please provide a user id');
+            $this->redirect(array('action'=>'index'));
+        }
+        $user = $this->User->findById($id);
+        if (!$user) {
+            $this->Session->setFlash('Invalid User ID Provided');
+            $this->redirect(array('action'=>'index'));
+        }
 
-            if (!$id) {
-                $this->Session->setFlash('Please provide a user id');
-                $this->redirect(array('action'=>'index'));
-            }
-            $user = $this->User->findById($id);
-            if (!$user) {
-                $this->Session->setFlash('Invalid User ID Provided');
-                $this->redirect(array('action'=>'index'));
-            }
+        $roleData = $this->Role->find('list', array('fields' => array('id', 'name'),'order'=>'id ASC'));
+        $studioData = $this->Studio->find('list', array('fields' => array('id', 'name'),'order'=>'id ASC'));
+        $this->set('roles', $roleData);
+        $this->set('studios', $studioData);
 
-            if ($this->request->is('post') || $this->request->is('put')) {
-                $this->User->id = $id;
-                if ($user['User']['email'] == $this->request->data['User']['email']) {
-                    unset($this->request->data['User']['email']);
-                }
-                if ($this->User->saveAll($this->request->data)) {
-                    $this->Session->setFlash(__('The user has been updated'));
-                    $this->redirect(array('action' => 'edit', $id));
-                }else{
-                    $this->Session->setFlash(__('Unable to update your user.'));
-                }
+        $userRoleInfo = $this->UserRoleStudio->find('all', array('conditions'=>array('user_id'=>$user['User']['id'])));
+        $this->set("userRoleInfo", $userRoleInfo);
+        if ($this->request->is('post') || $this->request->is('put')) {
+            $this->User->id = $id;
+            if ($user['User']['email'] == $this->request->data['User']['email']) {
+                unset($this->request->data['User']['email']);
             }
-
-            if (!$this->request->data) {
-                $this->request->data = $user;
+            if ($this->User->saveAll($this->request->data)) {
+                $this->Session->setFlash(__('The user has been updated'));
+                $this->redirect(array('action' => 'edit', $id));
+            }else{
+                $this->Session->setFlash(__('Unable to update your user.'));
             }
+        }
+        if (!$this->request->data) {
+            $this->request->data = $user;
+        }
     }
 
     public function delete($id = null) {
@@ -256,6 +263,74 @@ class UsersController extends AppController {
             $studios = $userRoleStudios['UserRoleStudio']['studio_id'];
         }
         return trim($studios);
+    }
+
+
+
+    // creates a ticket and sends an email
+    public function send()
+    {
+        if (!empty($this->params['data']))
+        {
+            $theUser = $this->User->findByEmail($this->params['data']['User']['email']);
+
+            if(is_array($theUser) && is_array($theUser['User']))
+            {
+                $ticket = $this->Tickets->set($theUser['User']['email']);
+
+                $to      = $theUser['User']['email']; // users email
+                $subject = utf8_decode('Password reset information');
+                $message = 'http://'.$_SERVER['SERVER_NAME'].'/'.$this->params['controller'].'/password/'.$ticket;
+                $from    = 'noreply@shaolinarts.com';
+                $headers = 'From: ' . $from . "\r\n" .
+                   'Reply-To: ' . $from . "\r\n" .
+                   'X-Mailer: CakePHP PHP ' . phpversion(). "\r\n" .
+                   'Content-Type: text/plain; charset=ISO-8859-1';
+
+                if(mail($to, $subject, utf8_decode( sprintf($this->Lang->show('recover_email'), $message) ."\r\n"."\r\n" ), $headers))
+                {
+                    $this->set('message', 'A recovery email was sent. Check your inbox.');
+                } else {
+                    // internal error, sorry
+                    $this->set('message', 'Server error, please try again later.');
+                }
+            }else{
+                // no user found for address
+                $this->set('message', 'No user with that email address');
+            }
+        }
+    }
+
+    // uses the ticket to reset the password for the correct user.
+    public function password($hash = null)
+    {
+        if ( $email = $this->Tickets->get($this->params['controller'], $hash) )
+        {
+            $authUser = $this->User->findByEmail($email);
+            if (is_array($authUser))
+            {
+                if (!empty($this->params['data']))
+                {
+                    $theUser = $this->User->findById($this->params['data']['User']['id']);
+
+                    if ($this->User->save($this->params['data']))
+                    {
+                        $this->set('message', 'Your new password was saved.');
+                    }else{
+                        $this->set('message', 'User could not be saved');
+                    }
+                    $this->Tickets->del($hash);
+                    $this->redirect( '/' );
+                }
+                unset($authUser['User']['pass']);
+                $this->params['data'] = $authUser;
+                $this->render();
+                return;
+            }
+        }
+        $this->Tickets->del($hash);
+        $this->set('message', 'No hash provided');
+        $this->redirect('/');
     }
 
 }
