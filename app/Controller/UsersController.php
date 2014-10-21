@@ -2,7 +2,7 @@
 App::uses('AppController', 'Controller');
 class UsersController extends AppController {
     public $uses = array('User', 'Role', 'Studio', 'UserRoleStudio');
-    public $helpers = array('User');
+    public $helpers = array('User','Js' => array('Jquery'));
     public $paginate = array(
         'limit' => 25,
             'conditions' => array('status' => '1'),
@@ -21,7 +21,7 @@ class UsersController extends AppController {
             if (in_array($this->action, array('user_home', 'change_info', 'learn', 'play', 'train'))) {
                 return true;
             }
-            if (in_array($this->action, array('user_management', 'edit', 'delete'))) {
+            if (in_array($this->action, array('user_management', 'edit', 'delete', 'add_role'))) {
                 $userRoleStudio = $this->UserRoleStudio->find('first', array('conditions'=>array('user_id'=>$user['id'], 'role_id in'=>array(1, 3, 4, 5))));
                 if (count($userRoleStudio)>0) {
                     return true;
@@ -208,6 +208,21 @@ class UsersController extends AppController {
         }
     }
 
+    public function add_role() {
+         if ($this->request->is('ajax')) {
+             $roleData = $this->Role->find('list', array('fields' => array('id', 'name'),'order'=>'id ASC'));
+             $studioData = $this->Studio->find('list', array('fields' => array('id', 'name'),'order'=>'id ASC'));
+             $this->set('roles', $roleData);
+             $this->set('studios', $studioData);
+             $user = $this->User->findById($id);
+             $userRoleInfo = $this->UserRoleStudio->find('all', array('conditions'=>array('user_id'=>$user['User']['id'])));
+             $this->set("userRoleInfo", $userRoleInfo);
+            // Use data from serialized form
+            // print_r($this->request->data['Contacts']); // name, email, message
+             $this->render('user-role-ajax-response', 'ajax'); // Render the contact-ajax-response view in the ajax layout
+         }
+    }
+
     public function delete($id = null) {
 
         if (!$id) {
@@ -264,8 +279,6 @@ class UsersController extends AppController {
         }
         return trim($studios);
     }
-
-
 
     // creates a ticket and sends an email
     public function send()

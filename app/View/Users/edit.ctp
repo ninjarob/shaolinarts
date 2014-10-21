@@ -1,8 +1,8 @@
-<?php echo $this->Form->create('User');?>
-<?php echo $this->Form->input('id', array('type'=>'hidden', 'value' => $this->data['User']['id'])); ?>
-<?php echo $this->Form->input('UserInfo.id', array('type'=>'hidden', 'value' => $this->data['UserInfo']['id'])); ?>
-<?php echo $this->Form->input('UserInfo.user_id', array('type'=>'hidden', 'value' => $this->data['User']['id'])); ?>
 <fieldset>
+    <?php echo $this->Form->create('User');?>
+    <?php echo $this->Form->input('id', array('type'=>'hidden', 'value' => $this->data['User']['id'])); ?>
+    <?php echo $this->Form->input('UserInfo.id', array('type'=>'hidden', 'value' => $this->data['UserInfo']['id'])); ?>
+    <?php echo $this->Form->input('UserInfo.user_id', array('type'=>'hidden', 'value' => $this->data['User']['id'])); ?>
     <legend><?php echo __('Edit User'); ?> &nbsp;&nbsp;&nbsp;(<?php echo $this->Html->link('Back To Manage Users', '/users/user_management') ?>)</legend>
     <div  style="float:left; width:400px;">
         <ul class="list-group">
@@ -69,10 +69,11 @@
             </li>
         </ul>
     </div>
+    <?php echo $this->Form->end(); ?>
     <div  style="margin-left: 20px; float:left; width:400px;">
         <h4>This user has the following roles:</h4>
 
-        <ul class="list-group">
+        <ul class="list-group" id="userRoleManagement">
             <?php foreach ($userRoleInfo as $j) { ?>
             <li class="list-group-item" style="width:500px;">
                 <?php echo($j['Role']['name']);?>
@@ -80,32 +81,22 @@
                 <div style="float:right; margin-right:5px;vertical-align: text-top;"><?php echo $this->Html->image('remove_icon.png', array('style'=>'width:20px; border:none; margin:0px;')); ?></div>
             </li>
             <?php } ?>
-            <li id="new-role" class="list-group-item" style="width:500px; height:46px;">
+            <li id="newRole" class="list-group-item" style="width:500px; height:46px;">
                 <?php
-                    echo $this->Form->create('UserRoleStudio', array('action' => 'save', 'default' => false));
+                    echo $this->Form->create('UserRoleStudio', array('url'=>'add_role', 'default' => false));
                     echo $this->Form->input('Role.id', array('options' => $roles, 'label'=>''));
                     echo $this->Form->input('Studio.id', array('options' => $studios, 'label'=>''));
-                    $options=array('update'=>'#userRole', 'type'=>'image', 'style'=>'width:20px; float:right; margin-right:5px;');
-                    echo $this->Js->submit('add_icon.png', $options);
+                    echo $this->Form->submit('add_icon.png', array('style'=>'width:20px; float:right; margin-right:5px;'));
                     echo $this->Form->end();
                 ?>
                 <?php
                     // JsHelper should be loaded in $helpers in controller
                     // Form ID: #ContactsContactForm
                     // Div to use for AJAX response: #contactStatus
-                    $data = $this->Js->get('#UserRoleStudioForm')->serializeForm(array('isForm' => true, 'inline' => true));
-                    $this->Js->get('#UserRoleStudioForm')->event(
-                    'submit',
-                    $this->Js->request(
-                    array('action' => 'contact', 'controller' => 'contacts'),
-                    array(
-                    'update' => '#contactStatus',
-                    'data' => $data,
-                    'async' => true,
-                    'dataExpression'=>true,
-                    'method' => 'POST'
-                    )
-                    )
+                    $data = $this->Js->get('#UserRoleStudioEditForm')->serializeForm(array('isForm' => true, 'inline' => true));
+                    $this->Js->get('#UserRoleStudioEditForm')->event('submit',
+                                        $this->Js->request(array('action' => 'add_role', 'controller' => 'users'),
+                                        array('update' => '#userRoleManagement','data'=>$data,'async' => true,'dataExpression'=>true,'method' => 'POST'))
                     );
                     echo $this->Js->writeBuffer();
                 ?>
@@ -113,4 +104,3 @@
         </ul>
     </div>
 </fieldset>
-<?php echo $this->Form->end(); ?>
