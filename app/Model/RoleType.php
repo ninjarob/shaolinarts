@@ -1,5 +1,5 @@
 <?php
-class Role extends AppModel {
+class RoleType extends AppModel {
     var $hasMany = array('Role');
 }
 ?>

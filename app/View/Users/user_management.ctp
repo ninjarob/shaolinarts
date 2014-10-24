@@ -1,5 +1,21 @@
+<script type="text/javascript">
+    function clearSearchFilter() {
+        $('#UserFnfilter').val('');
+        $('#UserLnfilter').val('');
+        $('#UserMrfilter :nth-child(1)').prop('selected', true);
+        $('#UserKffilter :nth-child(1)').prop('selected', true);
+        $('#UserTcfilter :nth-child(1)').prop('selected', true);
+        $('#UserSfilter :nth-child(1)').prop('selected', true);
+
+    }
+</script>
+
 <div class="users form">
-    <h3>User Management</h3>
+    <h3 style="clear:none;margin-top:0px;">User Management</h3>
+    <div style="float:right;">
+        <?php echo $this->Html->link( "Back to Admin", array('controller'=>'admin_pages', 'action'=>'admin_home'),array('escape' => false) ); ?>
+    </div>
+    <?php echo $this->Html->link( "Add A New User", array('action'=>'add'),array('escape' => false) ); ?>
     <table id="hor-minimalist-b" style="margin:0px;">
         <tr>
             <td style="white-space: nowrap;">First Name</td>
@@ -14,16 +30,19 @@
             <?php echo $this->Form->create('User', array('action'=>'user_management')); ?>
             <td><?php echo $this->Form->input('fnfilter', array('label'=>'', 'style'=>'font-size:8px; width:50px; height:20px;')); ?></td>
             <td><?php echo $this->Form->input('lnfilter', array('label'=>'', 'style'=>'font-size:8px; width:50px; height:20px;')); ?></td>
-            <td><?php echo $this->Form->input('mrfilter', array('label'=>'', 'style'=>'font-size:8px; width:180px; height:20px; white-space: nowrap;')); ?></td>
-            <td><?php echo $this->Form->input('kfrfilter', array('label'=>'', 'style'=>'font-size:8px; width:180px; height:20px;')); ?></td>
-            <td><?php echo $this->Form->input('tcrfilter', array('label'=>'', 'style'=>'font-size:8px; width:180px; height:20px;')); ?></td>
-            <td><?php echo $this->Form->input('sfilter', array('label'=>'', 'style'=>'font-size:8px; width:180px; height:20px;')); ?></td>
-            <td><?php echo $this->Form->button('Clear', array('type'=>'reset')); ?></td>
+            <td><?php echo $this->Form->input('mrfilter', array('empty'=>'Choose Manager Role', 'options' => $mrroles, 'label'=>'', 'style'=>'font-size:8px; width:180px; height:20px; white-space: nowrap;')); ?></td>
+            <td><?php echo $this->Form->input('kfrfilter', array('empty'=>'Choose Kung Fu Rank', 'options' => $kfroles, 'label'=>'', 'style'=>'font-size:8px; width:180px; height:20px;')); ?></td>
+            <td><?php echo $this->Form->input('tcrfilter', array('empty'=>'Choose Tai Chi Rank', 'options' => $tcroles, 'label'=>'', 'style'=>'font-size:8px; width:180px; height:20px;')); ?></td>
+            <td><?php echo $this->Form->input('sfilter', array('empty'=>'Choose Studio', 'options' => $studios, 'label'=>'', 'style'=>'font-size:8px; width:180px; height:20px;')); ?></td>
+            <td><?php echo $this->Form->button('Clear', array('type'=>'reset', 'onclick'=>'clearSearchFilter();')); ?></td>
             <td><?php echo $this->Form->submit('Go!', array('div' => false,'class' => 'urclass', 'title' => 'Filter Results')); ?></td>
             <?php echo $this->Form->end(); ?>
         </tr>
     </table>
     <br/>
+    <?php echo $this->Paginator->prev('<< ' . __('previous', true), array(), null, array('class'=>'disabled'));?>
+    <?php echo $this->Paginator->numbers(array( 'class' => 'numbers' ));?>
+    <?php echo $this->Paginator->next(__('next', true) . ' >>', array(), null, array('class' =>'disabled'));?>
     <table id="pattern-style-b">
         <thead>
         <tr>
@@ -103,11 +122,9 @@
         <?php unset($user); ?>
         </tbody>
     </table>
-    <?php echo $this->Paginator->prev('<< ' . __('previous', true), array(), null,
-    array('class'=>'disabled'));?>
+    <?php echo $this->Paginator->prev('<< ' . __('previous', true), array(), null, array('class'=>'disabled'));?>
     <?php echo $this->Paginator->numbers(array( 'class' => 'numbers' ));?>
-    <?php echo $this->Paginator->next(__('next', true) . ' >>', array(), null, array('class' =>
-    'disabled'));?>
+    <?php echo $this->Paginator->next(__('next', true) . ' >>', array(), null, array('class' =>'disabled'));?>
 </div>
-<?php echo $this->Html->link( "Add A New User.", array('action'=>'add'),array('escape' => false) ); ?>
+<?php echo $this->Html->link( "Add A New User", array('action'=>'add'),array('escape' => false) ); ?>
 <br/>

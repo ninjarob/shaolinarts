@@ -1,6 +1,9 @@
 <?php echo $this->Form->create('User');?>
 <fieldset>
     <legend><?php echo __('Registeration Form'); ?></legend>
+    <?php if (AuthComponent::user()) { ?>
+    <legend><?php echo $this->Html->link('Back To Manage Users', '/users/user_management') ?></legend>
+    <?php } ?>
     <ul class="list-group">
         <li class="input-group list-group-item">
             <label class="login_label">First Name*:</label>
@@ -33,7 +36,7 @@
         </li>
     <?php if (AuthComponent::user()) { ?>
         <li class="input-group list-group-item">
-            <label class="login_label">Website Role:</label>
+            <label class="login_label">Main Website Role:</label>
             <?php echo $this->Form->input('Role.id', array('options' => $roles, 'label'=>'')); ?>
         </li>
         <li class="input-group list-group-item">
@@ -41,7 +44,7 @@
             <?php echo $this->Form->input('Studio.id', array('options' => $studios, 'label'=>'')); ?>
         </li>
     <?php }
-    echo $this->Form->submit('Add User', array('class' => 'form-submit', 'title' => 'Click here to add the user'));
+    echo $this->Form->submit('Register', array('class' => 'form-submit', 'title' => 'Click here to add the user'));
     ?>
     </ul>
 </fieldset>

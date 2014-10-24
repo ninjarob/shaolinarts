@@ -30,4 +30,46 @@ App::uses('Model', 'Model');
  * @package       app.Model
  */
 class AppModel extends Model {
+
+    /**
+     * Checks to see if multiple values exist in the same row in the database,
+     * this is used when we have multiple fields making up the unique
+     * contraint in MySQL
+     *
+     *    @param array $params    Array consisting of "field" => "value"
+     *    @param int $id            PK of record being editited (optional)
+    */
+    function isUnique($params, $id="")
+    {
+        if (!is_array($params)) {
+            trigger_error(__METHOD__ . ' - $params must be an array', E_USER_ERROR);
+        }
+
+        // @var array $query    Array to $this->hasAny() against
+        $query = array();
+
+        // Set Recursive Seach mode.
+        $this->recursive = -1;
+
+        // Loop array of params building our our query array.
+        foreach ($params as $field => $value)
+        {
+            $query[$this->name . '.' . $field] = $value;
+        }
+
+        // Check to see if we need to query against an id
+        if (empty($id))
+            $fields[$this->name.'.id'] = "!= NULL";
+        else
+            $fields[$this->name.'.id'] = "!= {$id}";
+
+        // Run the query.
+        if ($this->hasAny($query)) {
+            // $this->invalidate('unique_'.$field);
+            return false;
+        }
+        else
+            return true;
+    }
+
 }
