@@ -43,7 +43,6 @@ class User extends AppModel {
                 'message' => 'Password must have a mimimum of 6 characters'
             )
         ),
-
         'password_confirm' => array(
             'required' => array(
                 'rule' => array('notEmpty'),

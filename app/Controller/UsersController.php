@@ -1,7 +1,7 @@
 <?php
 App::uses('AppController', 'Controller');
 class UsersController extends AppController {
-    public $uses = array('User', 'Role', 'Studio', 'UserRoleStudio');
+    public $uses = array('User', 'UserInfo', 'Role', 'Studio', 'UserRoleStudio');
     public $helpers = array('User','Js' => array('Jquery'));
     public $paginate = array(
         'limit' => 25,
@@ -151,7 +151,9 @@ class UsersController extends AppController {
     public function train() {}
 
     public function add() {
-        $this->layout = 'user_admin';
+        if($this->Session->check('Auth.User')){
+            $this->layout = 'user_admin';
+        }
         $roleData = $this->Role->find('list', array('fields' => array('id', 'name'),'order'=>'id ASC'));
         $studioData = $this->Studio->find('list', array('fields' => array('id', 'name'),'order'=>'id ASC'));
         $this->set('roles', $roleData);
@@ -165,16 +167,47 @@ class UsersController extends AppController {
             if (in_array('TaiChiRank', $this->request->data) && "0" === $this->request->data['TaiChiRank']['id']) {
                 $this->request->data['TaiChiRank'] = null;
             }
+            //roles get saved too, so this is tricky.
             if ($this->User->saveAll($this->request->data)) {
-                $this->Session->setFlash(__('Registration successful!'));
+                //checking admin rights
                 if($this->Session->check('Auth.User')){
-                    $this->redirect(array('action' => 'add'));
+                    $userRoleStudio = $this->UserRoleStudio->find('first', array('conditions'=>array('user_id'=>$this->Session->read('Auth.User.id'), 'role_id in'=>array(1, 3, 4, 5))));
+                    if (count($userRoleStudio)>0) { //give role selected by manager
+                        $newId = $this->User->id;
+                        $ursData = array('User'=>array('id'=>$newId), 'Role'=>array('id'=>$this->request->data['Role']['id']), 'Studio'=>array('id'=>$this->request->data['Studio']['id']));
+                        if ($this->UserRoleStudio->saveAll($ursData)) {
+                            $this->redirect(array('action' => 'add'));
+                            $this->Session->setFlash(__('Registration successful.'));
+                        }
+                        else {
+                            $this->UserInfo->deleteAll(array('user_id'=>$this->User->id), false);
+                            $this->User->delete($this->User->id);
+                            $this->Session->setFlash(__('Error in registration. Please, try again later.'));
+                        }
+                    }
                 }
                 else {
+                    //send email
+                    $this->Session->setFlash(__('Congratulations!  Please an email will be sent shortly.  Please go to your email and click on the link in order to gain access to your Shaolin Arts account.'));
                     $this->redirect(array('action' => 'login'));
                 }
+//                //no rights, so give them white at sandy
+//                else { //give white kf role
+//                    $newId = $this->User->id;
+//                    $ursData = array('User'=>array('id'=>$newId), 'Role'=>array('id'=>6), 'Studio'=>array('id'=>2));
+//                    if ($this->UserRoleStudio->saveAll($ursData)) {
+//                        $this->redirect(array('action' => 'add'));
+//                        $roleSaved = true;
+//                    }
+//                    else {
+//                        $this->Session->setFlash(__('Error in registration. Please, try again later.2'));
+//                    }
+//                    $this->redirect(array('action' => 'login'));
+//                }
+
+
             } else {
-                $this->Session->setFlash(__('Error in registration. Please, try again.'));
+                $this->Session->setFlash(__('Error in registration. Please, try again later.'));
             }
         }
     }
