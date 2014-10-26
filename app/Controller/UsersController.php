@@ -214,7 +214,7 @@ class UsersController extends AppController {
             } else {
                 if (!empty($this->User->validationErrors))
                 {
-                    $this->Session->setFlash(__('Error in registration.', 'default', array('class'=>'flasherrormsg'));
+                    $this->Session->setFlash(__('Error in registration.'), 'default', array('class'=>'flasherrormsg'));
                 }
                 else {
                     $this->Session->setFlash(__('Error in registration. If the problem persists, please try again later.'), 'default', array('class'=>'flasherrormsg'));
