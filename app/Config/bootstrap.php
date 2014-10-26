@@ -105,3 +105,24 @@ CakeLog::config('error', array(
 	'types' => array('warning', 'error', 'critical', 'alert', 'emergency'),
 	'file' => 'error',
 ));
+
+
+
+/**
+*  APP CONSTANTS
+*/
+//general
+
+
+//user
+Configure::write('User.successfullyRegistered','Congratulations!  Please an email will be sent shortly.  Please go to your email and click on the link in order to gain access to your Shaolin Arts account.');
+Configure::write('User.adminSuccessfullyRegistered','Registration successful. This user now has access to the site via the email and password you assigned.');
+Configure::write('User.failedRegistration', 'Error in registration. If the problem persists, please try again later.');
+Configure::write('User.failedRegistrationWithVE', 'Error in registration.');
+Configure::write('User.missingUserId', 'Please provide a user id');
+Configure::write('User.invalidUserId', 'Invalid User ID Provided');
+Configure::write('User.editSuccess', 'The user has been updated');
+Configure::write('User.editFailed', 'Unable to update user information. If the problem persists, please try again later.');
+Configure::write('User.ajaxAddRoleSuccess', 'You successfully added the role to this user.');
+Configure::write('User.ajaxAddRoleFailedExisting', 'Unable to add role - role already exists for this user.');
+Configure::write('User.ajaxAddRoleFailedWithVE', 'Unable to add role');

@@ -1,7 +1,7 @@
 <?php
 App::uses('AppController', 'Controller');
 class UsersController extends AppController {
-    public $uses = array('User', 'UserInfo', 'Role', 'Studio', 'UserRoleStudio');
+    public $uses = array('User', 'UserInfo', 'Role', 'Studio', 'UserRoleStudio', 'Status');
     public $helpers = array('User','Js' => array('Jquery'));
     public $paginate = array(
         'limit' => 25,
@@ -70,6 +70,7 @@ class UsersController extends AppController {
         $kfroleFilter = "";
         $tcroleFilter = "";
         $studioFilter = "";
+        $statusFilter = "";
 
         if (isset($this->params['data']['User'])) {
             $fnameFilter = $this->params['data']['User']['fnfilter'];
@@ -78,12 +79,14 @@ class UsersController extends AppController {
             $kfroleFilter = $this->params['data']['User']['kfrfilter'];
             $tcroleFilter = $this->params['data']['User']['tcrfilter'];
             $studioFilter = $this->params['data']['User']['sfilter'];
+            $statusFilter = $this->params['data']['User']['statfilter'];
             $this->set('fnfilter', $fnameFilter);
             $this->set('lnfilter', $lnameFilter);
             $this->set('mrfilter', $mroleFilter);
             $this->set('kfrfilter', $kfroleFilter);
             $this->set('tcrfilter', $tcroleFilter);
             $this->set('sfilter', $studioFilter);
+            $this->set('statusfilter', $statusFilter);
         }
 
         $roles = $this->Role->find('list', array('fields' => array('id', 'name'),'order'=>'id ASC'));
@@ -91,14 +94,16 @@ class UsersController extends AppController {
         $kfRoleData = $this->Role->find('list', array('fields' => array('id', 'name'),'conditions'=>array('role_type_id in (2,3,4,8,9)'),'order'=>'id ASC'));
         $tcRoleData = $this->Role->find('list', array('fields' => array('id', 'name'),'conditions'=>array('role_type_id in (5,6,7,10,11)'),'order'=>'id ASC'));
         $studioData = $this->Studio->find('list', array('fields' => array('id', 'name'), 'order'=>'id ASC'));
+        $statusData = $this->Status->find('list', array('fields' => array('id', 'name'), 'order'=>'id ASC'));
 
         $this->set('mrroles', $mrRoleData);
         $this->set('kfroles', $kfRoleData);
         $this->set('tcroles', $tcRoleData);
         $this->set('roles', $roles);
         $this->set('studios', $studioData);
+        $this->set('statuses', $statusData);
         $this->User->Behaviors->load('Containable');
-        $conditions = $this->setupConditions($fnameFilter, $lnameFilter, $mroleFilter, $kfroleFilter, $tcroleFilter, $studioFilter);
+        $conditions = $this->setupUserSearchConditions($fnameFilter, $lnameFilter, $mroleFilter, $kfroleFilter, $tcroleFilter, $studioFilter, $statusFilter);
         $this->paginate = array(
             'limit' => 25,
             'joins' =>  array(
@@ -111,37 +116,13 @@ class UsersController extends AppController {
                    )
                  )
              ),
-            'contain' => array('UserRoleStudio','UserInfo'),
+            'contain' => array('UserRoleStudio','UserInfo','Status'),
             'order' => array('UserInfo.fname' => 'asc' ),
             'group' => 'User.id',
             'conditions' => $conditions
         );
         $users = $this->paginate('User');
         $this->set(compact('users'));
-    }
-
-    private function setupConditions($fnameFilter, $lnameFilter, $mroleFilter, $kfroleFilter, $tcroleFilter, $studioFilter) {
-        $loggedInUserURS = $this->UserRoleStudio->find('all', array('conditions'=>array('user_id'=>$this->Auth->user('id'))));
-        $conditions = array("UserRoleStudio.studio_id in (".$this->getStudioViewRights($loggedInUserURS).")");
-        if (!empty($fnameFilter)) {
-            $conditions[]="UserInfo.fname like '%".$fnameFilter."%'";
-        }
-        if (!empty($lnameFilter)) {
-            $conditions[]="UserInfo.lname like '%".$lnameFilter."%'";
-        }
-        if (!empty($mroleFilter)) {
-            $conditions[]="UserRoleStudio.role_id = ".$mroleFilter;
-        }
-        if (!empty($kfroleFilter)) {
-            $conditions[]="UserRoleStudio.role_id = ".$kfroleFilter;
-        }
-        if (!empty($tcroleFilter)) {
-            $conditions[]="UserRoleStudio.role_id = ".$tcroleFilter;
-        }
-        if (!empty($studioFilter)) {
-            $conditions[]="UserRoleStudio.studio_id = ".$studioFilter;
-        }
-        return $conditions;
     }
 
     public function user_home() {}
@@ -176,48 +157,40 @@ class UsersController extends AppController {
                         $newId = $this->User->id;
                         $ursData = array('User'=>array('id'=>$newId), 'Role'=>array('id'=>$this->request->data['Role']['id']), 'Studio'=>array('id'=>$this->request->data['Studio']['id']));
                         if ($this->UserRoleStudio->saveAll($ursData)) {
-                            $this->Session->setFlash(__('Registration successful. This user now has access to the site via the email and password you assigned.'),
-                                                    'default', array('class'=>'flashmsg'));
-                            $this->redirect(array('action' => 'add'));
+                            $this->setFlashAndRedirect(Configure::read('User.adminSuccessfullyRegistered'), 'add', false);
                         }
                         else {
-                            $this->UserInfo->deleteAll(array('user_id'=>$this->User->id), false);
-                            $this->User->delete($this->User->id);
-                            $this->Session->setFlash(__('Error in registration. Please, try again later.'),
-                                                    'default', array('class'=>'flasherrormsg'));
-                            $this->redirect(array('action' => 'login'));
+                            $this->rollBackAddUser();
+                            $this->setFlashAndRedirect(Configure::read('User.failedRegistration'), 'add');
                         }
                     }
                 }
                 else {
-                    //send email
-                    sendEmailForNewUser($this->User->id);
-                    $this->Session->setFlash(__('Congratulations!  Please an email will be sent shortly.  Please go to your email and click on the link in order to gain access to your Shaolin Arts account.'),
-                                            'default', array('class'=>'flashmsg'));
-                    $this->redirect(array('action' => 'login'));
+                    $newId = $this->User->id;
+                    $ursData = array('User'=>array('id'=>$newId), 'Role'=>array('id'=>6), 'Studio'=>array('id'=>2));
+                    if ($this->UserRoleStudio->saveAll($ursData)) {
+                        //send email
+                        //var $mailSent = sendEmailForNewUser($this->User->id);
+                        if ($mailSent) {
+                            $this->setFlashAndRedirect(Configure::read('User.successfullyRegistered'), 'login', false);
+                        }
+                        else {
+                            $this->rollBackAddUser();
+                            $this->setFlashAndRedirect(Configure::read('User.failedRegistration'), 'login');
+                        }
+                    }
+                    else {
+                        $this->rollBackAddUser();
+                        $this->setFlashAndRedirect(Configure::read('User.failedRegistration'), 'login');
+                    }
                 }
-//                //no rights, so give them white at sandy
-//                else { //give white kf role
-//                    $newId = $this->User->id;
-//                    $ursData = array('User'=>array('id'=>$newId), 'Role'=>array('id'=>6), 'Studio'=>array('id'=>2));
-//                    if ($this->UserRoleStudio->saveAll($ursData)) {
-//                        $this->redirect(array('action' => 'add'));
-//                        $roleSaved = true;
-//                    }
-//                    else {
-//                        $this->Session->setFlash(__('Error in registration. Please, try again later.2'));
-//                    }
-//                    $this->redirect(array('action' => 'login'));
-//                }
-
-
             } else {
                 if (!empty($this->User->validationErrors))
                 {
-                    $this->Session->setFlash(__('Error in registration.'), 'default', array('class'=>'flasherrormsg'));
+                    $this->setFlashAndRedirect(Configure::read('User.failedRegistrationWithVE'));
                 }
                 else {
-                    $this->Session->setFlash(__('Error in registration. If the problem persists, please try again later.'), 'default', array('class'=>'flasherrormsg'));
+                    $this->setFlashAndRedirect(Configure::read('User.failedRegistration'));
                 }
             }
         }
@@ -225,33 +198,33 @@ class UsersController extends AppController {
 
     public function edit($id = null) {
         $this->layout = 'user_admin';
-        if (!$id) {
-            $this->Session->setFlash('Please provide a user id', 'default', array('class'=>'flasherrormsg'));
-            $this->redirect(array('action'=>'index'));
-        }
-        $user = $this->User->findById($id);
-        if (!$user) {
-            $this->Session->setFlash('Invalid User ID Provided', 'default', array('class'=>'flasherrormsg'));
-            $this->redirect(array('action'=>'index'));
-        }
-
         $roleData = $this->Role->find('list', array('fields' => array('id', 'name'),'order'=>'id ASC'));
         $studioData = $this->Studio->find('list', array('fields' => array('id', 'name'),'order'=>'id ASC'));
         $this->set('roles', $roleData);
         $this->set('studios', $studioData);
 
+        if (!$id) {
+            $this->setFlashAndRedirect(Configure::read('User.missingUserId'), 'user_management');
+        }
+        $user = $this->User->findById($id);
+        if (!$user) {
+            $this->setFlashAndRedirect(Configure::read('User.invalidUserId'), 'user_management');
+        }
+
         $userRoleInfo = $this->UserRoleStudio->find('all', array('conditions'=>array('user_id'=>$user['User']['id'])));
         $this->set("userRoleInfo", $userRoleInfo);
+
         if ($this->request->is('post') || $this->request->is('put')) {
             $this->User->id = $id;
             if ($user['User']['email'] == $this->request->data['User']['email']) {
                 unset($this->request->data['User']['email']);
             }
             if ($this->User->saveAll($this->request->data)) {
-                $this->Session->setFlash(__('The user has been updated'), 'default', array('class'=>'flashmsg'));
+                $this->setFlashAndRedirect(Configure::read('User.editSuccess'), null, false);
                 $this->redirect(array('action' => 'edit', $id));
             }else{
-                $this->Session->setFlash(__('Unable to update your user.'), 'default', array('class'=>'flasherrormsg'));
+                $this->setFlashAndRedirect(Configure::read('User.editFailed'));
+                $this->redirect(array('action' => 'edit', $id));
             }
         }
         if (!$this->request->data) {
@@ -260,71 +233,39 @@ class UsersController extends AppController {
     }
 
     public function ajax_add_role() {
-         if ($this->request->is('ajax')) {
-
-            if ($this->UserRoleStudio->saveAll($this->request->data)) {
-                //$this->Session->setFlash(__('The user has been updated'));
-            }else{
+        if ($this->request->is('ajax')) {
+            if (!$this->UserRoleStudio->saveAll($this->request->data)) {
                 if (isset($this->UserRoleStudio->validationErrors['unique'])) {
-                    $this->Session->setFlash(__('Unable to add role - role already exists for this user.'), 'default', array('class'=>'flasherrormsg'));
+                    $this->setFlashAndRedirect(Configure::read('User.ajaxAddRoleFailedExisting'));
                 }
                 else {
-                    $this->Session->setFlash(__('Unable to add role.'), 'default', array('class'=>'flasherrormsg'));
+                    $this->setFlashAndRedirect(Configure::read('User.ajaxAddRoleFailedWithVE'));
                 }
             }
-             $roleData = $this->Role->find('list', array('fields' => array('id', 'name'),'order'=>'id ASC'));
-             $studioData = $this->Studio->find('list', array('fields' => array('id', 'name'),'order'=>'id ASC'));
-             $this->set('roles', $roleData);
-             $this->set('studios', $studioData);
-             $userRoleInfo = $this->UserRoleStudio->find('all', array('conditions'=>array('user_id'=>$this->request->data['User']['id']), 'recursive'=>1));
-             $this->set("userRoleInfo", $userRoleInfo);
-             $this->render('user-role-ajax-response', 'ajax');
-         }
-    }
-
-    public function ajax_delete_role($id=null) {
-        // set default class & message for setFlash
-        $class = 'flash_bad';
-        $msg   = 'Invalid List Id';
-
-        // check id is valid
-        if($id!=null && is_numeric($id)) {
-            // get the Item
-            $usr = $this->UserRoleStudio->findById($id);
-            // check Item is valid
-            if(!empty($usr)) {
-                // try deleting the item
-                if($this->UserRoleStudio->delete($id)) {
-                    $class = 'flashmsg';
-                    $msg   = 'Role deleted';
-                } else {
-                    $msg = 'There was a problem deleting your Item, please try again';
-                }
-            }
+            $roleData = $this->Role->find('list', array('fields' => array('id', 'name'),'order'=>'id ASC'));
+            $studioData = $this->Studio->find('list', array('fields' => array('id', 'name'),'order'=>'id ASC'));
+            $this->set('roles', $roleData);
+            $this->set('studios', $studioData);
+            $userRoleInfo = $this->UserRoleStudio->find('all', array('conditions'=>array('user_id'=>$this->request->data['User']['id']), 'recursive'=>1));
+            $this->set("userRoleInfo", $userRoleInfo);
+            $this->render('user-role-ajax-response', 'ajax');
         }
-
-        // output JSON on AJAX request
-        if($this->request->is('ajax')) {
-            $this->autoRender = $this->layout = false;
-            echo json_encode(array('success'=>($class=='flasherrormsg') ? FALSE : TRUE));
-            exit;
-        }
-
-        // set flash message & redirect
-        $this->Session->setFlash($msg,'default',array('class'=>$class));
-        $this->redirect(array('action'=>'index'));
     }
 
     public function delete($id = null) {
+        $this->layout = 'user_admin';
 
         if (!$id) {
-            $this->Session->setFlash('Please provide a user id', 'default', array('class'=>'flasherrormsg'));
-            $this->redirect(array('action'=>'index'));
+            $this->setFlashAndRedirect(Configure::read('User.missingUserId'), 'user_management');
+        }
+        $user = $this->User->findById($id);
+        if (!$user) {
+            $this->setFlashAndRedirect(Configure::read('User.invalidUserId'), 'user_management');
         }
 
         $this->User->id = $id;
-        if ($this->User->delete($id)) {
-            $this->Session->setFlash('User successfully deleted', 'default', array('class'=>'flashmsg'));
+        if ($this->User->delete($id, true)) {
+            $this->setFlashAndRedirect('User successfully deleted', null, false);
         }
         else {
             $this->Session->setFlash('Invalid user id provided', 'default', array('class'=>'flasherrormsg'));
@@ -349,46 +290,6 @@ class UsersController extends AppController {
         }
         $this->Session->setFlash(__('User was not re-activated'), 'default', array('class'=>'flasherrormsg'));
         $this->redirect(array('action' => 'index'));
-    }
-
-    private function getStudioViewRights($userRoleStudios) {
-        $studios = "";
-        if (count($userRoleStudios) >= 1) {
-            foreach ($userRoleStudios as $urs) {
-                //catch admin
-                if ($urs['UserRoleStudio']['role_id'] == 5) return "1,2,3";
-                $studios = $studios.$urs['UserRoleStudio']['studio_id'].',';
-            }
-            $studios = rtrim($studios, ',');
-        }
-        else {
-            if ($userRoleStudios['UserRoleStudio']['role_id'] == 5) return "1,2,3";
-            $studios = $userRoleStudios['UserRoleStudio']['studio_id'];
-        }
-        return trim($studios);
-    }
-
-    // creates a ticket and sends an email
-    public function sendEmailForNewUser($userId)
-    {
-        $user = $this->User->findById($id);
-        $ticket = $this->Tickets->set($user['User']['email']);
-        $to      = $theUser['User']['email']; // users email
-        $subject = utf8_decode('New User Registration');
-        $message = 'http://'.$_SERVER['SERVER_NAME'].'/'.$this->params['controller'].'/userRegisterConfirm/'.$ticket;
-        //$from    = 'noreply@shaolinarts.com';
-        $from    = 'robatmywork@gmail.com';
-        $headers = 'From: ' . $from . "\r\n" .
-           'Reply-To: ' . $from . "\r\n" .
-           'X-Mailer: CakePHP PHP ' . phpversion(). "\r\n" .
-           'Content-Type: text/plain; charset=ISO-8859-1';
-
-        if(mail($to, $subject, utf8_decode( sprintf($this->Lang->show('recover_email'), $message) ."\r\n"."\r\n" ), $headers))
-        {
-
-        } else {
-
-        }
     }
 
     public function userRegisterConfirm() {
@@ -487,5 +388,126 @@ class UsersController extends AppController {
         $this->redirect('/');
     }
 
+
+
+    /**
+    *   PRIVATE UTILITY FUNCTIONS
+    */
+    // creates a ticket and sends an email
+    private function sendEmailForNewUser($userId)
+    {
+        $user = $this->User->findById($id);
+        $ticket = $this->Tickets->set($user['User']['email']);
+        $to      = $theUser['User']['email']; // users email
+        $subject = utf8_decode('New User Registration');
+        $message = 'http://'.$_SERVER['SERVER_NAME'].'/'.$this->params['controller'].'/userRegisterConfirm/'.$ticket;
+        //$from    = 'noreply@shaolinarts.com';
+        $from    = 'robatmywork@gmail.com';
+        $headers = 'From: ' . $from . "\r\n" .
+           'Reply-To: ' . $from . "\r\n" .
+           'X-Mailer: CakePHP PHP ' . phpversion(). "\r\n" .
+           'Content-Type: text/plain; charset=ISO-8859-1';
+
+        if(mail($to, $subject, utf8_decode( sprintf($this->Lang->show('recover_email'), $message) ."\r\n"."\r\n" ), $headers))
+        {
+
+        } else {
+
+        }
+    }
+
+    private function setupUserSearchConditions($fnameFilter, $lnameFilter, $mroleFilter, $kfroleFilter, $tcroleFilter, $studioFilter, $statusFilter) {
+        $loggedInUserURS = $this->UserRoleStudio->find('all', array('conditions'=>array('user_id'=>$this->Auth->user('id'))));
+        $conditions = array("UserRoleStudio.studio_id in (".$this->getStudioViewRights($loggedInUserURS).")");
+        if (!empty($fnameFilter)) {
+            $conditions[]="UserInfo.fname like '%".$fnameFilter."%'";
+        }
+        if (!empty($lnameFilter)) {
+            $conditions[]="UserInfo.lname like '%".$lnameFilter."%'";
+        }
+        if (!empty($mroleFilter)) {
+            $conditions[]="UserRoleStudio.role_id = ".$mroleFilter;
+        }
+        if (!empty($kfroleFilter)) {
+            $conditions[]="UserRoleStudio.role_id = ".$kfroleFilter;
+        }
+        if (!empty($tcroleFilter)) {
+            $conditions[]="UserRoleStudio.role_id = ".$tcroleFilter;
+        }
+        if (!empty($studioFilter)) {
+            $conditions[]="UserRoleStudio.studio_id = ".$studioFilter;
+        }
+        if (!empty($statusFilter)) {
+            $conditions[]="status_id = ".$statusFilter;
+        }
+        return $conditions;
+    }
+
+    private function rollBackAddUser() {
+        $this->UserInfo->deleteAll(array('user_id'=>$this->User->id), false);
+        $this->UserRoleStudio->deleteAll(array('user_id'=>$this->User->id), false);
+        $this->User->delete($this->User->id);
+    }
+
+    private function getStudioViewRights($userRoleStudios) {
+        $studios = "";
+        if (count($userRoleStudios) >= 1) {
+            foreach ($userRoleStudios as $urs) {
+                //catch admin
+                if ($urs['UserRoleStudio']['role_id'] == 5) return "1,2,3";
+                $studios = $studios.$urs['UserRoleStudio']['studio_id'].',';
+            }
+            $studios = rtrim($studios, ',');
+        }
+        else {
+            if ($userRoleStudios['UserRoleStudio']['role_id'] == 5) return "1,2,3";
+            $studios = $userRoleStudios['UserRoleStudio']['studio_id'];
+        }
+        return trim($studios);
+    }
+
+    private function setFlashAndRedirect($flashMessage, $redirectAction=null, $errorFlag=true) {
+        $this->Session->setFlash(__($flashMessage), 'default', array('class'=>$errorFlag?'flasherrormsg':'flashmsg'));
+        if ($redirectAction != null) {
+            $this->log($redirectAction);
+            $this->redirect(array('action' => $redirectAction));
+        }
+    }
+
+    /**
+    *   AJAX FUNCTIONS
+    */
+    public function ajax_delete_role($id=null) {
+        // set default class & message for setFlash
+        $class = 'flash_bad';
+        $msg   = 'Invalid List Id';
+
+        // check id is valid
+        if($id!=null && is_numeric($id)) {
+            // get the Item
+            $usr = $this->UserRoleStudio->findById($id);
+            // check Item is valid
+            if(!empty($usr)) {
+                // try deleting the item
+                if($this->UserRoleStudio->delete($id)) {
+                    $class = 'flashmsg';
+                    $msg   = 'Role deleted';
+                } else {
+                    $msg = 'There was a problem deleting your Item, please try again';
+                }
+            }
+        }
+
+        // output JSON on AJAX request
+        if($this->request->is('ajax')) {
+            $this->autoRender = $this->layout = false;
+            echo json_encode(array('success'=>($class=='flasherrormsg') ? FALSE : TRUE));
+            exit;
+        }
+
+        // set flash message & redirect
+        $this->Session->setFlash($msg,'default',array('class'=>$class));
+        $this->redirect(array('action'=>'index'));
+    }
 }
 ?>

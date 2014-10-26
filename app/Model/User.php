@@ -3,10 +3,8 @@ App::uses('AuthComponent', 'Controller/Component');
 
 class User extends AppModel {
 
-    var $hasMany = array('UserRoleStudio' => array(
-                                     'foreignKey' => 'user_id'
-                                 ));
-    var $hasOne = 'UserInfo';
+    var $hasMany = array('UserRoleStudio' => array('foreignKey' => 'user_id', 'dependent'=>true));
+    var $hasOne = array('UserInfo' => array('dependent'=>true));
     var $belongsTo = 'Status';
 
     public $validate = array(

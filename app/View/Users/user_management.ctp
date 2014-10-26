@@ -6,7 +6,7 @@
         $('#UserKffilter :nth-child(1)').prop('selected', true);
         $('#UserTcfilter :nth-child(1)').prop('selected', true);
         $('#UserSfilter :nth-child(1)').prop('selected', true);
-
+        $('#UserStatfilter :nth-child(1)').prop('selected', true);
     }
 </script>
 
@@ -30,10 +30,11 @@
             <?php echo $this->Form->create('User', array('action'=>'user_management')); ?>
             <td><?php echo $this->Form->input('fnfilter', array('label'=>'', 'style'=>'font-size:8px; width:50px; height:20px;')); ?></td>
             <td><?php echo $this->Form->input('lnfilter', array('label'=>'', 'style'=>'font-size:8px; width:50px; height:20px;')); ?></td>
-            <td><?php echo $this->Form->input('mrfilter', array('empty'=>'Choose Manager Role', 'options' => $mrroles, 'label'=>'', 'style'=>'font-size:8px; width:180px; height:20px; white-space: nowrap;')); ?></td>
-            <td><?php echo $this->Form->input('kfrfilter', array('empty'=>'Choose Kung Fu Rank', 'options' => $kfroles, 'label'=>'', 'style'=>'font-size:8px; width:180px; height:20px;')); ?></td>
-            <td><?php echo $this->Form->input('tcrfilter', array('empty'=>'Choose Tai Chi Rank', 'options' => $tcroles, 'label'=>'', 'style'=>'font-size:8px; width:180px; height:20px;')); ?></td>
-            <td><?php echo $this->Form->input('sfilter', array('empty'=>'Choose Studio', 'options' => $studios, 'label'=>'', 'style'=>'font-size:8px; width:180px; height:20px;')); ?></td>
+            <td><?php echo $this->Form->input('mrfilter', array('empty'=>'Choose Manager Role', 'options' => $mrroles, 'label'=>'', 'style'=>'font-size:8px; width:150px; height:20px; white-space: nowrap;')); ?></td>
+            <td><?php echo $this->Form->input('kfrfilter', array('empty'=>'Choose Kung Fu Rank', 'options' => $kfroles, 'label'=>'', 'style'=>'font-size:8px; width:150px; height:20px;')); ?></td>
+            <td><?php echo $this->Form->input('tcrfilter', array('empty'=>'Choose Tai Chi Rank', 'options' => $tcroles, 'label'=>'', 'style'=>'font-size:8px; width:150px; height:20px;')); ?></td>
+            <td><?php echo $this->Form->input('sfilter', array('empty'=>'Choose Studio', 'options' => $studios, 'label'=>'', 'style'=>'font-size:8px; width:150px; height:20px;')); ?></td>
+            <td><?php echo $this->Form->input('statfilter', array('empty'=>'Choose Status', 'options' => $statuses, 'label'=>'', 'style'=>'font-size:8px; width:150px; height:20px;')); ?></td>
             <td><?php echo $this->Form->button('Clear', array('type'=>'reset', 'onclick'=>'clearSearchFilter();')); ?></td>
             <td><?php echo $this->Form->submit('Go!', array('div' => false,'class' => 'urclass', 'title' => 'Filter Results')); ?></td>
             <?php echo $this->Form->end(); ?>
@@ -53,7 +54,7 @@
             <th>Address</th>
             <th style="white-space: nowrap;">Spouse Guardian</th>
             <th>Birthday</th>
-
+            <th>Status</th>
             <th><?php if ($this->User->isManager(AuthComponent::user('id'))) {  ?>Actions<?php } ?></th>
         </tr>
         </thead>
@@ -64,8 +65,8 @@
         <?php if($count % 2): echo '<tr>'; else: echo '
         <tr class="zebra">' ?>
             <?php endif; ?>
-            <td><?php echo $user['UserInfo']['fname']; ?></td>
-            <td><?php echo $user['UserInfo']['lname']; ?></td>
+            <td><div style="width:80px"><?php echo $user['UserInfo']['fname']; ?></div></td>
+            <td><div style="width:80px"><?php echo $user['UserInfo']['lname']; ?></div></td>
             <td>
                 <?php foreach ($user['UserRoleStudio'] as $urs) { ?>
                     <div style="white-space: nowrap;">
@@ -89,7 +90,7 @@
                     <div style="white-space: nowrap;">WP: <?php echo $user['UserInfo']['workphone']; ?></div>
                 <?php } ?>
             </td>
-            <td>
+            <td style="font-size: 8px;">
                 <div style="white-space: nowrap"><?php echo $user['UserInfo']['address']; ?></div>
                 <div style="white-space: nowrap">
                     <?php if (!empty($user['UserInfo']['spouseguardian'])) { ?><?php echo $user['UserInfo']['city']; ?>,<?php } ?>
@@ -110,11 +111,15 @@
             <td>
                 <div style="white-space: nowrap;"><?php echo $user['UserInfo']['birthdate']; ?></div>
             </td>
-            <td style="font-size: 8px;">
+            <td>
+                <div style="width:50px;"><?php echo $user['Status']['name']; ?></div>
+            </td>
+            <td style="font-size:8px;">
                 <?php if ($this->User->isManager(AuthComponent::user('id'))) {  ?>
-                <div style="width:130px"><?php echo $this->Html->link("Edit", array('action'=>'edit', $user['User']['id']), array('style'=>'font-size:8px;')); ?> |
-                    <?php echo $this->Html->link( "Delete", array('action'=>'delete', $user['User']['id']), array('style'=>'font-size:8px;'));
-                ?></div>
+                <div style="width:80px"><?php echo $this->Html->link("Edit", array('action'=>'edit', $user['User']['id']), array('style'=>'font-size:8px;')); ?> |
+                    <?php echo $this->Html->link( "Delete", array('action'=>'delete', $user['User']['id']), array('style'=>'font-size:8px;', 'onclick'=>'return confirm("Are you sure you want to delete this user?")'));
+                ?>
+                </div>
                 <?php } ?>
             </td>
         </tr>
