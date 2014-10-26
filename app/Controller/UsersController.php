@@ -42,16 +42,16 @@ class UsersController extends AppController {
                 $userRoleStudio = $this->UserRoleStudio->find('first', array('conditions'=>array('user_id'=>$this->Auth->user('id'))));
                 //if they have any roles, send them to the welcome
                 if (count($userRoleStudio)>0) {
-                    $this->Session->setFlash(__('Welcome, '. $this->Auth->user('email')));
+                    $this->Session->setFlash(__('Welcome, '. $this->Auth->user('email')), 'default', array('class'=>'flashmsg'));
                     $this->redirect($this->Auth->redirectUrl());
                 }
                 //otherwise log them back out.  They've got to have roles first.
                 else {
-                    $this->Session->setFlash(__('There was a problem processing your login.  You may not yet have rights to access the ShaolinArts user pages'));
+                    $this->Session->setFlash(__('There was a problem processing your login.  You may not yet have rights to access the ShaolinArts user pages'), 'default', array('class'=>'flasherrormsg'));
                     $this->redirect(array('action' => 'logout'));
                 }
             } else {
-                $this->Session->setFlash(__('Invalid email or password'));
+                $this->Session->setFlash(__('Invalid email or password'), 'default', array('class'=>'flasherrormsg'));
                 $this->log($this->Auth->ValidationErrors());
             }
         }
@@ -176,20 +176,24 @@ class UsersController extends AppController {
                         $newId = $this->User->id;
                         $ursData = array('User'=>array('id'=>$newId), 'Role'=>array('id'=>$this->request->data['Role']['id']), 'Studio'=>array('id'=>$this->request->data['Studio']['id']));
                         if ($this->UserRoleStudio->saveAll($ursData)) {
+                            $this->Session->setFlash(__('Registration successful. This user now has access to the site via the email and password you assigned.'),
+                                                    'default', array('class'=>'flashmsg'));
                             $this->redirect(array('action' => 'add'));
-                            $this->Session->setFlash(__('Registration successful.'));
                         }
                         else {
                             $this->UserInfo->deleteAll(array('user_id'=>$this->User->id), false);
                             $this->User->delete($this->User->id);
-                            $this->Session->setFlash(__('Error in registration. Please, try again later.'));
+                            $this->Session->setFlash(__('Error in registration. Please, try again later.'),
+                                                    'default', array('class'=>'flasherrormsg'));
+                            $this->redirect(array('action' => 'login'));
                         }
                     }
                 }
                 else {
                     //send email
                     sendEmailForNewUser($this->User->id);
-                    $this->Session->setFlash(__('Congratulations!  Please an email will be sent shortly.  Please go to your email and click on the link in order to gain access to your Shaolin Arts account.'));
+                    $this->Session->setFlash(__('Congratulations!  Please an email will be sent shortly.  Please go to your email and click on the link in order to gain access to your Shaolin Arts account.'),
+                                            'default', array('class'=>'flashmsg'));
                     $this->redirect(array('action' => 'login'));
                 }
 //                //no rights, so give them white at sandy
@@ -208,7 +212,13 @@ class UsersController extends AppController {
 
 
             } else {
-                $this->Session->setFlash(__('Error in registration. Please, try again later.'));
+                if (!empty($this->User->validationErrors))
+                {
+                    $this->Session->setFlash(__('Error in registration.', 'default', array('class'=>'flasherrormsg'));
+                }
+                else {
+                    $this->Session->setFlash(__('Error in registration. If the problem persists, please try again later.'), 'default', array('class'=>'flasherrormsg'));
+                }
             }
         }
     }
@@ -216,12 +226,12 @@ class UsersController extends AppController {
     public function edit($id = null) {
         $this->layout = 'user_admin';
         if (!$id) {
-            $this->Session->setFlash('Please provide a user id');
+            $this->Session->setFlash('Please provide a user id', 'default', array('class'=>'flasherrormsg'));
             $this->redirect(array('action'=>'index'));
         }
         $user = $this->User->findById($id);
         if (!$user) {
-            $this->Session->setFlash('Invalid User ID Provided');
+            $this->Session->setFlash('Invalid User ID Provided', 'default', array('class'=>'flasherrormsg'));
             $this->redirect(array('action'=>'index'));
         }
 
@@ -238,10 +248,10 @@ class UsersController extends AppController {
                 unset($this->request->data['User']['email']);
             }
             if ($this->User->saveAll($this->request->data)) {
-                $this->Session->setFlash(__('The user has been updated'));
+                $this->Session->setFlash(__('The user has been updated'), 'default', array('class'=>'flashmsg'));
                 $this->redirect(array('action' => 'edit', $id));
             }else{
-                $this->Session->setFlash(__('Unable to update your user.'));
+                $this->Session->setFlash(__('Unable to update your user.'), 'default', array('class'=>'flasherrormsg'));
             }
         }
         if (!$this->request->data) {
@@ -256,10 +266,10 @@ class UsersController extends AppController {
                 //$this->Session->setFlash(__('The user has been updated'));
             }else{
                 if (isset($this->UserRoleStudio->validationErrors['unique'])) {
-                    $this->Session->setFlash(__('Unable to add role - role already exists for this user.'));
+                    $this->Session->setFlash(__('Unable to add role - role already exists for this user.'), 'default', array('class'=>'flasherrormsg'));
                 }
                 else {
-                    $this->Session->setFlash(__('Unable to add role.'));
+                    $this->Session->setFlash(__('Unable to add role.'), 'default', array('class'=>'flasherrormsg'));
                 }
             }
              $roleData = $this->Role->find('list', array('fields' => array('id', 'name'),'order'=>'id ASC'));
@@ -285,7 +295,7 @@ class UsersController extends AppController {
             if(!empty($usr)) {
                 // try deleting the item
                 if($this->UserRoleStudio->delete($id)) {
-                    $class = 'flash_good';
+                    $class = 'flashmsg';
                     $msg   = 'Role deleted';
                 } else {
                     $msg = 'There was a problem deleting your Item, please try again';
@@ -296,7 +306,7 @@ class UsersController extends AppController {
         // output JSON on AJAX request
         if($this->request->is('ajax')) {
             $this->autoRender = $this->layout = false;
-            echo json_encode(array('success'=>($class=='flash_bad') ? FALSE : TRUE));
+            echo json_encode(array('success'=>($class=='flasherrormsg') ? FALSE : TRUE));
             exit;
         }
 
@@ -308,36 +318,36 @@ class UsersController extends AppController {
     public function delete($id = null) {
 
         if (!$id) {
-            $this->Session->setFlash('Please provide a user id');
+            $this->Session->setFlash('Please provide a user id', 'default', array('class'=>'flasherrormsg'));
             $this->redirect(array('action'=>'index'));
         }
 
         $this->User->id = $id;
         if ($this->User->delete($id)) {
-            $this->Session->setFlash('User successfully deleted');
+            $this->Session->setFlash('User successfully deleted', 'default', array('class'=>'flashmsg'));
         }
         else {
-            $this->Session->setFlash('Invalid user id provided');
+            $this->Session->setFlash('Invalid user id provided', 'default', array('class'=>'flasherrormsg'));
         }
         $this->redirect(array('action' => 'user_management'));
     }
 
     public function activate($id = null) {
         if (!$id) {
-            $this->Session->setFlash('Please provide a user id');
+            $this->Session->setFlash('Please provide a user id', 'default', array('class'=>'flasherrormsg'));
             $this->redirect(array('action'=>'index'));
         }
 
         $this->User->id = $id;
         if (!$this->User->exists()) {
-            $this->Session->setFlash('Invalid user id provided');
+            $this->Session->setFlash('Invalid user id provided', 'default', array('class'=>'flasherrormsg'));
             $this->redirect(array('action'=>'index'));
         }
         if ($this->User->saveField('status', 1)) {
-            $this->Session->setFlash(__('User re-activated'));
+            $this->Session->setFlash(__('User re-activated'), 'default', array('class'=>'flashmsg'));
             $this->redirect(array('action' => 'index'));
         }
-        $this->Session->setFlash(__('User was not re-activated'));
+        $this->Session->setFlash(__('User was not re-activated'), 'default', array('class'=>'flasherrormsg'));
         $this->redirect(array('action' => 'index'));
     }
 

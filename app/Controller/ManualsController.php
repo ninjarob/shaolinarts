@@ -22,7 +22,7 @@ class ManualsController extends AppController {
         Configure::write('debug', 0);
        //just in case its been deleted, or someone is getting frisky
         if(!isset($file['Manual']['name'])){
-            $this->Session->setFlash("Problem. Either;<ul><li>We no longer have that file</li><li>We never did.</li><li>You don't have rights</li></ul>");
+            $this->Session->setFlash("Problem. Either;<ul><li>We no longer have that file</li><li>We never did.</li><li>You don't have rights</li></ul>", 'default', array('class'=>'flasherrormsg'));
             $this->redirect('/');
 
         }

@@ -16,3 +16,11 @@
 #newRole div.input.select {
     float:left;
 }
+
+.flashmsg{
+    color:green;
+}
+
+.flasherrormsg {
+    color:red;
+}
