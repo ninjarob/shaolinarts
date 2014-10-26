@@ -188,6 +188,7 @@ class UsersController extends AppController {
                 }
                 else {
                     //send email
+                    sendEmailForNewUser($this->User->id);
                     $this->Session->setFlash(__('Congratulations!  Please an email will be sent shortly.  Please go to your email and click on the link in order to gain access to your Shaolin Arts account.'));
                     $this->redirect(array('action' => 'login'));
                 }
@@ -358,7 +359,60 @@ class UsersController extends AppController {
     }
 
     // creates a ticket and sends an email
-    public function send()
+    public function sendEmailForNewUser($userId)
+    {
+        $user = $this->User->findById($id);
+        $ticket = $this->Tickets->set($user['User']['email']);
+        $to      = $theUser['User']['email']; // users email
+        $subject = utf8_decode('New User Registration');
+        $message = 'http://'.$_SERVER['SERVER_NAME'].'/'.$this->params['controller'].'/userRegisterConfirm/'.$ticket;
+        //$from    = 'noreply@shaolinarts.com';
+        $from    = 'robatmywork@gmail.com';
+        $headers = 'From: ' . $from . "\r\n" .
+           'Reply-To: ' . $from . "\r\n" .
+           'X-Mailer: CakePHP PHP ' . phpversion(). "\r\n" .
+           'Content-Type: text/plain; charset=ISO-8859-1';
+
+        if(mail($to, $subject, utf8_decode( sprintf($this->Lang->show('recover_email'), $message) ."\r\n"."\r\n" ), $headers))
+        {
+
+        } else {
+
+        }
+    }
+
+    public function userRegisterConfirm() {
+        if ( $email = $this->Tickets->get($this->params['controller'], $hash) )
+        {
+            $authUser = $this->User->findByEmail($email);
+            if (is_array($authUser))
+            {
+                if (!empty($this->params['data']))
+                {
+                    $theUser = $this->User->findById($this->params['data']['User']['id']);
+
+                    if ($this->User->save($this->params['data']))
+                    {
+                        $this->set('message', 'Your new password was saved.');
+                    }else{
+                        $this->set('message', 'User could not be saved');
+                    }
+                    $this->Tickets->del($hash);
+                    $this->redirect( '/' );
+                }
+                unset($authUser['User']['pass']);
+                $this->params['data'] = $authUser;
+                $this->render();
+                return;
+            }
+        }
+        $this->Tickets->del($hash);
+        $this->set('message', 'No hash provided');
+        $this->redirect('/');
+    }
+
+    // creates a ticket and sends an email
+    public function sendEmailForPasswordRenewal()
     {
         if (!empty($this->params['data']))
         {

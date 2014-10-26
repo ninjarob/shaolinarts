@@ -7,6 +7,7 @@ class User extends AppModel {
                                      'foreignKey' => 'user_id'
                                  ));
     var $hasOne = 'UserInfo';
+    var $belongsTo = 'Status';
 
     public $validate = array(
         'email' => array(

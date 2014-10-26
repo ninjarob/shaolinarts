@@ -23,7 +23,6 @@
 <div class="container">
     <div class="row header">
 
-        <?php echo $this->element('banner'); ?>
         <?php echo $this->element('navigation'); ?>
 
         <div class="row corpus">

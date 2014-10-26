@@ -7,23 +7,19 @@
     <ul class="list-group">
         <li class="input-group list-group-item">
             <label class="login_label">First Name*:</label>
-            <?php echo $this->Form->input('UserInfo.fname', array('label'=>'', 'maxLength' => 32, 'title' =>
-            'First Name')); ?>
+            <?php echo $this->Form->input('UserInfo.fname', array('label'=>'', 'maxLength' => 32, 'title' => 'First Name')); ?>
         </li>
         <li class="input-group list-group-item">
             <label class="login_label">Last Name*:</label>
-            <?php echo $this->Form->input('UserInfo.lname', array('label'=>'', 'maxLength' => 32, 'title' =>
-            'Last Name')); ?>
+            <?php echo $this->Form->input('UserInfo.lname', array('label'=>'', 'maxLength' => 32, 'title' => 'Last Name')); ?>
         </li>
         <li class="input-group list-group-item">
             <label class="login_label">Email*:</label>
-            <?php echo $this->Form->input('email', array('label'=>'', 'maxLength' => 100, 'title' =>
-            'Email')); ?>
+            <?php echo $this->Form->input('email', array('label'=>'', 'maxLength' => 100, 'title' =>'Email')); ?>
         </li>
         <li class="input-group list-group-item">
             <label class="login_label">Email Confirm*:</label>
-            <?php echo $this->Form->input('email_confirm', array('label'=>'', 'maxLength' => 100, 'title' =>
-            'Email Confirmation')); ?>
+            <?php echo $this->Form->input('email_confirm', array('label'=>'', 'maxLength' => 100, 'title' =>'Email Confirmation')); ?>
         </li>
         <li class="input-group list-group-item">
             <label class="login_label">Password*:</label>
@@ -34,6 +30,11 @@
             <?php echo $this->Form->input('password_confirm', array('label' => '', 'maxLength' => 255,
             'title' => 'Confirm password', 'type'=>'password')); ?>
         </li>
+        <?php if (AuthComponent::user()) { ?>
+            <?php echo $this->Form->hidden('status_id', array('value'=>3)); ?>
+        <?php } else { ?>
+            <?php echo $this->Form->hidden('status_id', array('value'=>1)); ?>
+        <?php } ?>
         <!--<li class="input-group list-group-item">-->
             <!--<label class="login_label">Home Phone:</label>-->
             <!--<?php echo $this->Form->input('UserInfo.homephone', array('label'=>'', 'maxLength' => 32, 'title' => 'Home Phone')); ?>-->
@@ -93,4 +94,4 @@
     </ul>
 </fieldset>
 <?php echo $this->Form->end(); ?>
-<script type="text/javascript">  $(document).ready(function() {    $('#Email').focus();  });</script>
+<script type="text/javascript">  $(document).ready(function() {$('#Email').focus();});</script>
