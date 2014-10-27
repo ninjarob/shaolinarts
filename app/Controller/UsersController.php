@@ -18,7 +18,7 @@ class UsersController extends AppController {
     public function isAuthorized($user) {
         $userRoleStudio = $this->UserRoleStudio->find('first', array('conditions'=>array('user_id'=>$user['id'])));
         if (count($userRoleStudio)>0) {
-            if (in_array($this->action, array('user_home', 'change_info', 'learn', 'play', 'train'))) {
+            if (in_array($this->action, array('user_home', 'change_info', 'learn', 'play', 'train', 'extra'))) {
                 return true;
             }
             if (in_array($this->action, array('user_management', 'edit', 'delete', 'ajax_add_role', 'ajax_delete_role', 'activate', 'disable'))) {
@@ -130,6 +130,7 @@ class UsersController extends AppController {
     public function learn() {}
     public function play() {}
     public function train() {}
+    public function extra() {}
 
     public function add() {
         if($this->Session->check('Auth.User')){
