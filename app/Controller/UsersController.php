@@ -21,7 +21,7 @@ class UsersController extends AppController {
             if (in_array($this->action, array('user_home', 'change_info', 'learn', 'play', 'train'))) {
                 return true;
             }
-            if (in_array($this->action, array('user_management', 'edit', 'delete', 'ajax_add_role', 'ajax_delete_role'))) {
+            if (in_array($this->action, array('user_management', 'edit', 'delete', 'ajax_add_role', 'ajax_delete_role', 'activate', 'disable'))) {
                 $userRoleStudio = $this->UserRoleStudio->find('first', array('conditions'=>array('user_id'=>$user['id'], 'role_id in'=>array(1, 3, 4, 5))));
                 if (count($userRoleStudio)>0) {
                     return true;
@@ -203,13 +203,7 @@ class UsersController extends AppController {
         $this->set('roles', $roleData);
         $this->set('studios', $studioData);
 
-        if (!$id) {
-            $this->setFlashAndRedirect(Configure::read('User.missingUserId'), 'user_management');
-        }
-        $user = $this->User->findById($id);
-        if (!$user) {
-            $this->setFlashAndRedirect(Configure::read('User.invalidUserId'), 'user_management');
-        }
+        $user = $this->userIdProblems($id);
 
         $userRoleInfo = $this->UserRoleStudio->find('all', array('conditions'=>array('user_id'=>$user['User']['id'])));
         $this->set("userRoleInfo", $userRoleInfo);
@@ -254,15 +248,7 @@ class UsersController extends AppController {
 
     public function delete($id = null) {
         $this->layout = 'user_admin';
-
-        if (!$id) {
-            $this->setFlashAndRedirect(Configure::read('User.missingUserId'), 'user_management');
-        }
-        $user = $this->User->findById($id);
-        if (!$user) {
-            $this->setFlashAndRedirect(Configure::read('User.invalidUserId'), 'user_management');
-        }
-
+        $this->userIdProblems($id);
         $this->User->id = $id;
         if ($this->User->delete($id, true)) {
             $this->setFlashAndRedirect('User successfully deleted', null, false);
@@ -274,22 +260,29 @@ class UsersController extends AppController {
     }
 
     public function activate($id = null) {
-        if (!$id) {
-            $this->Session->setFlash('Please provide a user id', 'default', array('class'=>'flasherrormsg'));
-            $this->redirect(array('action'=>'index'));
-        }
-
+        $this->layout = 'user_admin';
+        $this->userIdProblems($id);
         $this->User->id = $id;
-        if (!$this->User->exists()) {
+        if ($this->User->saveField('status_id', 3)) {
+            $this->setFlashAndRedirect('User re-activated', null, false);
+        }
+        else {
             $this->Session->setFlash('Invalid user id provided', 'default', array('class'=>'flasherrormsg'));
-            $this->redirect(array('action'=>'index'));
         }
-        if ($this->User->saveField('status', 1)) {
-            $this->Session->setFlash(__('User re-activated'), 'default', array('class'=>'flashmsg'));
-            $this->redirect(array('action' => 'index'));
+        $this->redirect(array('action' => 'user_management'));
+    }
+
+    public function disable($id = null) {
+        $this->layout = 'user_admin';
+        $this->userIdProblems($id);
+        $this->User->id = $id;
+        if ($this->User->saveField('status_id', 4)) {
+            $this->setFlashAndRedirect('User successfully disabled', null, false);
         }
-        $this->Session->setFlash(__('User was not re-activated'), 'default', array('class'=>'flasherrormsg'));
-        $this->redirect(array('action' => 'index'));
+        else {
+            $this->Session->setFlash('Invalid user id provided', 'default', array('class'=>'flasherrormsg'));
+        }
+        $this->redirect(array('action' => 'user_management'));
     }
 
     public function userRegisterConfirm() {
@@ -389,7 +382,6 @@ class UsersController extends AppController {
     }
 
 
-
     /**
     *   PRIVATE UTILITY FUNCTIONS
     */
@@ -472,6 +464,17 @@ class UsersController extends AppController {
             $this->log($redirectAction);
             $this->redirect(array('action' => $redirectAction));
         }
+    }
+
+    private function userIdProblems($id) {
+        if (!$id) {
+            $this->setFlashAndRedirect(Configure::read('User.missingUserId'), 'user_management');
+        }
+        $user = $this->User->findById($id);
+        if (!$user) {
+            $this->setFlashAndRedirect(Configure::read('User.invalidUserId'), 'user_management');
+        }
+        return $user;
     }
 
     /**

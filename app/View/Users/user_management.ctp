@@ -116,9 +116,15 @@
             </td>
             <td style="font-size:8px;">
                 <?php if ($this->User->isManager(AuthComponent::user('id'))) {  ?>
-                <div style="width:80px"><?php echo $this->Html->link("Edit", array('action'=>'edit', $user['User']['id']), array('style'=>'font-size:8px;')); ?> |
-                    <?php echo $this->Html->link( "Delete", array('action'=>'delete', $user['User']['id']), array('style'=>'font-size:8px;', 'onclick'=>'return confirm("Are you sure you want to delete this user?")'));
-                ?>
+                <div style="width:90px">
+                    <?php echo $this->Html->link("Edit", array('action'=>'edit', $user['User']['id']), array('style'=>'font-size:8px;')); ?> |
+                    <?php echo $this->Html->link( "Delete", array('action'=>'delete', $user['User']['id']), array('style'=>'font-size:8px;',
+                                                    'onclick'=>'return confirm("Are you sure you want to delete this user?")'));?> |
+                    <?php if ($user['Status']['id'] != 3) { ?>
+                        <?php echo $this->Html->link("Activate", array('action'=>'activate', $user['User']['id']), array('style'=>'font-size:8px;')); ?>
+                    <?php } else if ($user['Status']['id'] == 3) { ?>
+                    <?php echo $this->Html->link("Disable", array('action'=>'disable', $user['User']['id']), array('style'=>'font-size:8px;')); ?>
+                    <?php } ?>
                 </div>
                 <?php } ?>
             </td>
