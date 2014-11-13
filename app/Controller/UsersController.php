@@ -1,12 +1,15 @@
 <?php
 App::uses('AppController', 'Controller');
+App::import('Vendor', 'PhpMailer', array('file' => 'phpmailer' . DS . 'PHPMailerAutoload.php'));
 class UsersController extends AppController {
-    public $uses = array('User', 'UserInfo', 'Role', 'Studio', 'UserRoleStudio', 'Status');
+    public $uses = array('User', 'UserInfo', 'Role', 'Studio', 'UserRoleStudio', 'Status', 'Ticket');
+    //var $components = array('Email'); //  use component email
+
     public $helpers = array('User','Js' => array('Jquery'));
     public $paginate = array(
         'limit' => 25,
             'conditions' => array('status' => '1'),
-            'order' => array('User.email' => 'asc' )
+            'order' => array('User.email' => 'asc')
     );
 
     public function beforeFilter() {
@@ -171,7 +174,7 @@ class UsersController extends AppController {
                     $ursData = array('User'=>array('id'=>$newId), 'Role'=>array('id'=>6), 'Studio'=>array('id'=>2));
                     if ($this->UserRoleStudio->saveAll($ursData)) {
                         //send email
-                        //var $mailSent = sendEmailForNewUser($this->User->id);
+                        $mailSent = $this->sendEmailForNewUser($this->User->id);
                         if ($mailSent) {
                             $this->setFlashAndRedirect(Configure::read('User.successfullyRegistered'), 'login', false);
                         }
@@ -383,30 +386,61 @@ class UsersController extends AppController {
     }
 
 
-    /**
+    /***********************************
     *   PRIVATE UTILITY FUNCTIONS
-    */
+    ************************************/
     // creates a ticket and sends an email
     private function sendEmailForNewUser($userId)
     {
-        $user = $this->User->findById($id);
-        $ticket = $this->Tickets->set($user['User']['email']);
-        $to      = $theUser['User']['email']; // users email
-        $subject = utf8_decode('New User Registration');
-        $message = 'http://'.$_SERVER['SERVER_NAME'].'/'.$this->params['controller'].'/userRegisterConfirm/'.$ticket;
-        //$from    = 'noreply@shaolinarts.com';
-        $from    = 'robatmywork@gmail.com';
-        $headers = 'From: ' . $from . "\r\n" .
-           'Reply-To: ' . $from . "\r\n" .
-           'X-Mailer: CakePHP PHP ' . phpversion(). "\r\n" .
-           'Content-Type: text/plain; charset=ISO-8859-1';
+        $user = $this->User->findById($userId);
+//        $ticket = $this->Ticket->set($user['User']['email']);
+//        $to      = $user['User']['email']; // users email
+//        $subject = utf8_decode('New User Registration');
+//        $this->log($_SERVER['SERVER_NAME']);
+//        $message = 'http://'.$_SERVER['SERVER_NAME'].'/users/userRegisterConfirm/'.$ticket;
+//        //$from    = 'noreply@shaolinarts.com';
+//        $from    = 'robatmywork@gmail.com';
+//        $headers = 'From: ' . $from . "\r\n" .
+//           'Reply-To: ' . $from . "\r\n" .
+//           'X-Mailer: CakePHP PHP ' . phpversion(). "\r\n" .
+//           'Content-Type: text/plain; charset=ISO-8859-1';
 
-        if(mail($to, $subject, utf8_decode( sprintf($this->Lang->show('recover_email'), $message) ."\r\n"."\r\n" ), $headers))
-        {
 
-        } else {
+        $mail = new PHPMailer(true);
 
+        //Send mail using gmail
+        if(true){
+            $mail->IsSMTP(); // telling the class to use SMTP
+            $mail->SMTPAuth = true; // enable SMTP authentication
+            $mail->SMTPSecure = "ssl"; // sets the prefix to the servier
+            $mail->Host = "smtp.gmail.com"; // sets GMAIL as the SMTP server
+            $mail->Port = 465; // set the SMTP port for the GMAIL server
+            $mail->Username = "shaolinartsemailpta@gmail.com"; // GMAIL username
+            $mail->Password = "KungFuPanda"; // GMAIL password
         }
+        $this->log($user['User']['email']);
+        //Typical mail data
+        $mail->AddAddress($user['User']['email']);
+        $mail->SetFrom("shaolinartsemailpta@gmail.com", "Robert Kevan");
+        $mail->Subject = "My Subject";
+        $mail->Body = "Mail contents";
+
+        try{
+            $mail->Send();
+            echo "Success!";
+        } catch(Exception $e){
+            //Something went bad
+            $this->log($mail);
+        }
+
+
+
+        //if(mail($to, $subject, utf8_decode($message ."\r\n"."\r\n" ), $headers))
+        //{
+
+        //} else {
+
+        //}
     }
 
     private function setupUserSearchConditions($fnameFilter, $lnameFilter, $mroleFilter, $kfroleFilter, $tcroleFilter, $studioFilter, $statusFilter) {
@@ -478,9 +512,9 @@ class UsersController extends AppController {
         return $user;
     }
 
-    /**
+    /****************************
     *   AJAX FUNCTIONS
-    */
+    *****************************/
     public function ajax_delete_role($id=null) {
         // set default class & message for setFlash
         $class = 'flash_bad';
