@@ -3,7 +3,7 @@ App::uses('AppController', 'Controller');
 App::import('Vendor', 'PhpMailer', array('file' => 'phpmailer' . DS . 'PHPMailerAutoload.php'));
 class UsersController extends AppController {
     public $uses = array('User', 'UserInfo', 'Role', 'Studio', 'UserRoleStudio', 'Status', 'Ticket');
-    //var $components = array('Email'); //  use component email
+    var $components = array('Tickets'); //  use component email
 
     public $helpers = array('User','Js' => array('Jquery'));
     public $paginate = array(
@@ -14,7 +14,7 @@ class UsersController extends AppController {
 
     public function beforeFilter() {
         parent::beforeFilter();
-        $this->Auth->allow('login','add','logout');
+        $this->Auth->allow('login','add','logout','resendEmailForNewUser','userRegisterConfirm');
         $this->layout = 'user';
     }
 
@@ -43,19 +43,26 @@ class UsersController extends AppController {
         if ($this->request->is('post')) {
             if ($this->Auth->login()) {
                 $userRoleStudio = $this->UserRoleStudio->find('first', array('conditions'=>array('user_id'=>$this->Auth->user('id'))));
+                $user = $this->User->find('first', array('conditions'=>array('user.id'=>$this->Auth->user('id'))));
                 //if they have any roles, send them to the welcome
-                if (count($userRoleStudio)>0) {
+                if (count($userRoleStudio)>0 && $user['User']['status_id'] > 1) {
                     $this->Session->setFlash(__('Welcome, '. $this->Auth->user('email')), 'default', array('class'=>'flashmsg'));
                     $this->redirect($this->Auth->redirectUrl());
                 }
                 //otherwise log them back out.  They've got to have roles first.
                 else {
-                    $this->Session->setFlash(__('There was a problem processing your login.  You may not yet have rights to access the ShaolinArts user pages'), 'default', array('class'=>'flasherrormsg'));
-                    $this->redirect(array('action' => 'logout'));
+                    if ($user['User']['status_id'] == 1) {
+                        $resendLink = ' <a href="resendEmailForNewUser/'.$this->Auth->user('id').'" style="font-size:10px;">(Resend Email)</a>';
+                        $this->Auth->logout();
+                        $this->setFlashAndRedirect(Configure::read('User.loginFailedEmailReg'), 'login', true, $resendLink);
+                    }
+                    else {
+                        $this->Auth->logout();
+                        $this->setFlashAndRedirect(Configure::read('User.loginFailed'), 'login', true);
+                    }
                 }
             } else {
-                $this->Session->setFlash(__('Invalid email or password'), 'default', array('class'=>'flasherrormsg'));
-                $this->log($this->Auth->ValidationErrors());
+                $this->setFlashAndRedirect(Configure::read('User.loginInvalid'), 'login', true);
             }
         }
     }
@@ -289,34 +296,23 @@ class UsersController extends AppController {
         $this->redirect(array('action' => 'user_management'));
     }
 
-    public function userRegisterConfirm() {
-        if ( $email = $this->Tickets->get($this->params['controller'], $hash) )
+    public function userRegisterConfirm($hash) {
+        if ($email = $this->Tickets->get($hash) )
         {
             $authUser = $this->User->findByEmail($email);
             if (is_array($authUser))
             {
-                if (!empty($this->params['data']))
+                $this->User->id = $authUser['User']['id'];
+                if ($this->User->saveField('status_id', 3))
                 {
-                    $theUser = $this->User->findById($this->params['data']['User']['id']);
-
-                    if ($this->User->save($this->params['data']))
-                    {
-                        $this->set('message', 'Your new password was saved.');
-                    }else{
-                        $this->set('message', 'User could not be saved');
-                    }
                     $this->Tickets->del($hash);
-                    $this->redirect( '/' );
+                    $this->setFlashAndRedirect('Congratulations!  Your account has been officially registered with ShaolinArts.com!  You may log in.', 'login', false);
+                }else{
+                    $this->setFlashAndRedirect(Configure::read('User.confirmRegistrationFailed'), 'login', true);
                 }
-                unset($authUser['User']['pass']);
-                $this->params['data'] = $authUser;
-                $this->render();
-                return;
             }
         }
-        $this->Tickets->del($hash);
-        $this->set('message', 'No hash provided');
-        $this->redirect('/');
+        $this->setFlashAndRedirect(Configure::read('User.confirmRegistrationFailed'), 'login', true);
     }
 
     // creates a ticket and sends an email
@@ -385,6 +381,10 @@ class UsersController extends AppController {
         $this->redirect('/');
     }
 
+    public function resendEmailForNewUser($userId) {
+        $this->sendEmailForNewUser($userId);
+        $this->redirect(array('action' => 'login'));
+    }
 
     /***********************************
     *   PRIVATE UTILITY FUNCTIONS
@@ -392,19 +392,14 @@ class UsersController extends AppController {
     // creates a ticket and sends an email
     private function sendEmailForNewUser($userId)
     {
+        if (!$this->User->hasAny(array('User.id'=>$userId))) {
+            $this->log("User doesn't exist. ");
+            return false;
+        }
         $user = $this->User->findById($userId);
-//        $ticket = $this->Ticket->set($user['User']['email']);
-//        $to      = $user['User']['email']; // users email
-//        $subject = utf8_decode('New User Registration');
-//        $this->log($_SERVER['SERVER_NAME']);
-//        $message = 'http://'.$_SERVER['SERVER_NAME'].'/users/userRegisterConfirm/'.$ticket;
-//        //$from    = 'noreply@shaolinarts.com';
-//        $from    = 'robatmywork@gmail.com';
-//        $headers = 'From: ' . $from . "\r\n" .
-//           'Reply-To: ' . $from . "\r\n" .
-//           'X-Mailer: CakePHP PHP ' . phpversion(). "\r\n" .
-//           'Content-Type: text/plain; charset=ISO-8859-1';
 
+        $ticket = $this->Tickets->set($user['User']['email']);
+        $messageLink = 'https://'$_SERVER['HTTP_HOST'].$this->webroot.$this->params['controller'].'/userRegisterConfirm/'.$ticket;
 
         $mail = new PHPMailer(true);
 
@@ -422,25 +417,18 @@ class UsersController extends AppController {
         //Typical mail data
         $mail->AddAddress($user['User']['email']);
         $mail->SetFrom("shaolinartsemailpta@gmail.com", "Robert Kevan");
-        $mail->Subject = "My Subject";
-        $mail->Body = "Mail contents";
+        $mail->Subject = "ShaolinArts.com email verification";
+        $mail->Body = "Please click the following link to verify your ShaolinArts.com user account.  ".$messageLink;
 
         try{
             $mail->Send();
-            echo "Success!";
+            return true;
         } catch(Exception $e){
             //Something went bad
-            $this->log($mail);
+            $this->log("There was a problem sending an email for the new user. ".$mail);
+            $this->log($e);
         }
-
-
-
-        //if(mail($to, $subject, utf8_decode($message ."\r\n"."\r\n" ), $headers))
-        //{
-
-        //} else {
-
-        //}
+        return false;
     }
 
     private function setupUserSearchConditions($fnameFilter, $lnameFilter, $mroleFilter, $kfroleFilter, $tcroleFilter, $studioFilter, $statusFilter) {
@@ -493,10 +481,9 @@ class UsersController extends AppController {
         return trim($studios);
     }
 
-    private function setFlashAndRedirect($flashMessage, $redirectAction=null, $errorFlag=true) {
-        $this->Session->setFlash(__($flashMessage), 'default', array('class'=>$errorFlag?'flasherrormsg':'flashmsg'));
+    private function setFlashAndRedirect($flashMessage, $redirectAction=null, $errorFlag=true, $appendString="") {
+        $this->Session->setFlash(__($flashMessage).$appendString, 'default', array('class'=>$errorFlag?'flasherrormsg':'flashmsg'));
         if ($redirectAction != null) {
-            $this->log($redirectAction);
             $this->redirect(array('action' => $redirectAction));
         }
     }

@@ -115,7 +115,7 @@ CakeLog::config('error', array(
 
 
 //user
-Configure::write('User.successfullyRegistered','Congratulations!  Please an email will be sent shortly.  Please go to your email and click on the link in order to gain access to your Shaolin Arts account.');
+Configure::write('User.successfullyRegistered','Congratulations!  An email will be sent to your account shortly.  Please go to your email and click on the link in order to gain access to your Shaolin Arts account.');
 Configure::write('User.adminSuccessfullyRegistered','Registration successful. This user now has access to the site via the email and password you assigned.');
 Configure::write('User.failedRegistration', 'Error in registration. If the problem persists, please try again later.');
 Configure::write('User.failedRegistrationWithVE', 'Error in registration.');
@@ -126,3 +126,7 @@ Configure::write('User.editFailed', 'Unable to update user information. If the p
 Configure::write('User.ajaxAddRoleSuccess', 'You successfully added the role to this user.');
 Configure::write('User.ajaxAddRoleFailedExisting', 'Unable to add role - role already exists for this user.');
 Configure::write('User.ajaxAddRoleFailedWithVE', 'Unable to add role');
+Configure::write('User.loginInvalid', 'Invalid login email or password.');
+Configure::write('User.loginFailed', 'There was a problem processing your login.  You may not yet have rights to access the ShaolinArts user pages.');
+Configure::write('User.loginFailedEmailReg', 'Pending email activation.  Please look in your email inbox for an email with instructions to activate your account with ShaolinArts.com.');
+Configure::write('User.confirmRegistrationFailed', 'There was a problem confirming your user account.  If the problem persists, please contact the system administrator.');

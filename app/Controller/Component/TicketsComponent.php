@@ -1,6 +1,6 @@
 <?php
-
-class TicketsComponent
+App::import('Model', 'Ticket');
+class TicketsComponent extends Component
 {
     // Create a new ticket by providing the data to be stored in the ticket.
     function set($info = null)
@@ -28,7 +28,7 @@ class TicketsComponent
         {
             $ticketObj = new Ticket();
             $data = $ticketObj->findByHash($ticket);
-            if (is_array($data) && is_array($data['Ticket']))
+            if (is_array($data) && isset($data['Ticket']) && is_array($data['Ticket']))
             {
                 // optionally auto-delete the ticket -> this->del($ticket);
                 return $data['Ticket']['data'];
@@ -47,7 +47,7 @@ class TicketsComponent
             $data = $ticketObj->findByHash($ticket);
             if ( is_array($data) && is_array($data['Ticket']) )
             {
-                return $data = $ticketObj->del($data['Ticket']['id']);
+                return $data = $ticketObj->delete($data['Ticket']['id']);
             }
         }
         return false;
