@@ -43,7 +43,7 @@ class UsersController extends AppController {
         if ($this->request->is('post')) {
             if ($this->Auth->login()) {
                 $userRoleStudio = $this->UserRoleStudio->find('first', array('conditions'=>array('user_id'=>$this->Auth->user('id'))));
-                $user = $this->User->find('first', array('conditions'=>array('user.id'=>$this->Auth->user('id'))));
+                $user = $this->User->find('first', array('conditions'=>array('User.id'=>$this->Auth->user('id'))));
                 //if they have any roles, send them to the welcome
                 if (count($userRoleStudio)>0 && $user['User']['status_id'] > 1) {
                     $this->Session->setFlash(__('Welcome, '. $this->Auth->user('email')), 'default', array('class'=>'flashmsg'));
@@ -399,7 +399,7 @@ class UsersController extends AppController {
         $user = $this->User->findById($userId);
 
         $ticket = $this->Tickets->set($user['User']['email']);
-        $messageLink = 'https://'$_SERVER['HTTP_HOST'].$this->webroot.$this->params['controller'].'/userRegisterConfirm/'.$ticket;
+        $messageLink = 'https://'.$_SERVER['HTTP_HOST'].$this->webroot.$this->params['controller'].'/userRegisterConfirm/'.$ticket;
 
         $mail = new PHPMailer(true);
 
@@ -413,13 +413,12 @@ class UsersController extends AppController {
             $mail->Username = "shaolinartsemailpta@gmail.com"; // GMAIL username
             $mail->Password = "KungFuPanda"; // GMAIL password
         }
-        $this->log($user['User']['email']);
+
         //Typical mail data
         $mail->AddAddress($user['User']['email']);
         $mail->SetFrom("shaolinartsemailpta@gmail.com", "Robert Kevan");
         $mail->Subject = "ShaolinArts.com email verification";
         $mail->Body = "Please click the following link to verify your ShaolinArts.com user account.  ".$messageLink;
-
         try{
             $mail->Send();
             return true;
