@@ -8,12 +8,16 @@ class ManualsController extends AppController {
     }
 
     public function isAuthorized($user) {
-       if (isset($user['role_id']) && $user['role_id'] >=0) {
-            if (in_array($this->action, array('download', 'show'))) {
+        $userRoleStudio = $this->UserRoleStudio->find('first', array('conditions'=>array('user_id'=>$user['id'])));
+        if (count($userRoleStudio)>0) {
+            $userRoleStudio = $this->UserRoleStudio->find('first', array('conditions'=>array('user_id'=>$user['id'], 'role_id in'=>array(
+                select urs.id from user_role_studios usr where
+            ))));
+            if (count($userRoleStudio)>0 && in_array($this->action, array('download', 'show'))) {
                 return true;
             }
-       }
-       return parent::isAuthorized($user);
+        }
+        return parent::isAuthorized($user);
     }
 
     function download($id) {

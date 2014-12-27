@@ -41,6 +41,7 @@
         </tr>
     </table>
     <br/>
+    <?php if ($users) { ?>
     <?php echo $this->Paginator->prev('<< ' . __('previous', true), array(), null, array('class'=>'disabled'));?>
     <?php echo $this->Paginator->numbers(array( 'class' => 'numbers' ));?>
     <?php echo $this->Paginator->next(__('next', true) . ' >>', array(), null, array('class' =>'disabled'));?>
@@ -136,6 +137,11 @@
     <?php echo $this->Paginator->prev('<< ' . __('previous', true), array(), null, array('class'=>'disabled'));?>
     <?php echo $this->Paginator->numbers(array( 'class' => 'numbers' ));?>
     <?php echo $this->Paginator->next(__('next', true) . ' >>', array(), null, array('class' =>'disabled'));?>
+    <br>
+    <?php echo $this->Html->link( "Add A New User", array('action'=>'add'),array('escape' => false) ); ?>
+    <?php } else { ?>
+    <br>
+    No users found.
+    <?php } ?>
 </div>
-<?php echo $this->Html->link( "Add A New User", array('action'=>'add'),array('escape' => false) ); ?>
 <br/>

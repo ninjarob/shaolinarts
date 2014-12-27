@@ -19,16 +19,17 @@ class UsersController extends AppController {
     }
 
     public function isAuthorized($user) {
+        if (in_array($this->action, array('user_home', 'account', 'extra'))) {
+            return true;
+        }
         $userRoleStudio = $this->UserRoleStudio->find('first', array('conditions'=>array('user_id'=>$user['id'])));
         if (count($userRoleStudio)>0) {
-            if (in_array($this->action, array('user_home', 'change_info', 'learn', 'play', 'train', 'extra'))) {
+            if (in_array($this->action, array('learn', 'play', 'train', 'record'))) {
                 return true;
             }
-            if (in_array($this->action, array('user_management', 'edit', 'delete', 'ajax_add_role', 'ajax_delete_role', 'activate', 'disable'))) {
-                $userRoleStudio = $this->UserRoleStudio->find('first', array('conditions'=>array('user_id'=>$user['id'], 'role_id in'=>array(1, 3, 4, 5))));
-                if (count($userRoleStudio)>0) {
-                    return true;
-                }
+            $userRoleStudio = $this->UserRoleStudio->find('first', array('conditions'=>array('user_id'=>$user['id'], 'role_id in'=>array(1, 3, 4, 5))));
+            if (count($userRoleStudio)>0 && in_array($this->action, array('user_management', 'edit', 'delete', 'ajax_add_role', 'ajax_delete_role', 'activate', 'disable'))) {
+                return true;
             }
         }
         return parent::isAuthorized($user);
@@ -42,10 +43,10 @@ class UsersController extends AppController {
         // if we get the post information, try to authenticate
         if ($this->request->is('post')) {
             if ($this->Auth->login()) {
-                $userRoleStudio = $this->UserRoleStudio->find('first', array('conditions'=>array('user_id'=>$this->Auth->user('id'))));
+                //$userRoleStudio = $this->UserRoleStudio->find('first', array('conditions'=>array('user_id'=>$this->Auth->user('id'))));
                 $user = $this->User->find('first', array('conditions'=>array('User.id'=>$this->Auth->user('id'))));
                 //if they have any roles, send them to the welcome
-                if (count($userRoleStudio)>0 && $user['User']['status_id'] > 1) {
+                if (/*count($userRoleStudio)>0 && */$user['User']['status_id'] > 1) {
                     $this->Session->setFlash(__('Welcome, '. $this->Auth->user('email')), 'default', array('class'=>'flashmsg'));
                     $this->redirect($this->Auth->redirectUrl());
                 }
@@ -136,10 +137,11 @@ class UsersController extends AppController {
     }
 
     public function user_home() {}
-    public function change_info() {}
+    public function account() {}
     public function learn() {}
     public function play() {}
     public function train() {}
+    public function record() {}
     public function extra() {}
 
     public function add() {
@@ -177,9 +179,9 @@ class UsersController extends AppController {
                     }
                 }
                 else {
-                    $newId = $this->User->id;
-                    $ursData = array('User'=>array('id'=>$newId), 'Role'=>array('id'=>6), 'Studio'=>array('id'=>2));
-                    if ($this->UserRoleStudio->saveAll($ursData)) {
+//                    $newId = $this->User->id;
+//                    $ursData = array('User'=>array('id'=>$newId), 'Role'=>array('id'=>6), 'Studio'=>array('id'=>2));
+//                    if ($this->UserRoleStudio->saveAll($ursData)) {
                         //send email
                         $mailSent = $this->sendEmailForNewUser($this->User->id);
                         if ($mailSent) {
@@ -189,11 +191,11 @@ class UsersController extends AppController {
                             $this->rollBackAddUser();
                             $this->setFlashAndRedirect(Configure::read('User.failedRegistration'), 'login');
                         }
-                    }
-                    else {
-                        $this->rollBackAddUser();
-                        $this->setFlashAndRedirect(Configure::read('User.failedRegistration'), 'login');
-                    }
+//                    }
+//                    else {
+//                        $this->rollBackAddUser();
+//                        $this->setFlashAndRedirect(Configure::read('User.failedRegistration'), 'login');
+//                    }
                 }
             } else {
                 if (!empty($this->User->validationErrors))
@@ -432,7 +434,11 @@ class UsersController extends AppController {
 
     private function setupUserSearchConditions($fnameFilter, $lnameFilter, $mroleFilter, $kfroleFilter, $tcroleFilter, $studioFilter, $statusFilter) {
         $loggedInUserURS = $this->UserRoleStudio->find('all', array('conditions'=>array('user_id'=>$this->Auth->user('id'))));
-        $conditions = array("UserRoleStudio.studio_id in (".$this->getStudioViewRights($loggedInUserURS).")");
+        $viewStudioRights = $this->getStudioViewRights($loggedInUserURS);
+        $conditions = array();
+        if ($viewStudioRights != "admin") {
+            $conditions = array("UserRoleStudio.studio_id in (".$viewStudioRights.")");
+        }
         if (!empty($fnameFilter)) {
             $conditions[]="UserInfo.fname like '%".$fnameFilter."%'";
         }
@@ -468,13 +474,13 @@ class UsersController extends AppController {
         if (count($userRoleStudios) >= 1) {
             foreach ($userRoleStudios as $urs) {
                 //catch admin
-                if ($urs['UserRoleStudio']['role_id'] == 5) return "1,2,3";
+                if ($urs['UserRoleStudio']['role_id'] == 5) return "admin";//"1,2,3";
                 $studios = $studios.$urs['UserRoleStudio']['studio_id'].',';
             }
             $studios = rtrim($studios, ',');
         }
         else {
-            if ($userRoleStudios['UserRoleStudio']['role_id'] == 5) return "1,2,3";
+            if ($userRoleStudios['UserRoleStudio']['role_id'] == 5) return "admin";//"1,2,3";
             $studios = $userRoleStudios['UserRoleStudio']['studio_id'];
         }
         return trim($studios);

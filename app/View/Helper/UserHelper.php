@@ -2,6 +2,16 @@
 App::uses('AppHelper', 'View/Helper');
 
 class UserHelper extends AppHelper {
+    public function isStudent($id) {
+        App::import("Model", "UserRoleStudio");
+        $model = new UserRoleStudio();
+        $userRolesCount = $model->find("count", array('conditions'=>array('user_id'=>$id)));
+        if ($userRolesCount >= 1) {
+            return true;
+        }
+        return false;
+    }
+
     public function isManager($id) {
         App::import("Model", "UserRoleStudio");
         $model = new UserRoleStudio();
@@ -45,7 +55,7 @@ class UserHelper extends AppHelper {
         App::import("Model", "UserRoleStudio");
         $model = new UserRoleStudio();
         $userRoleStudios = $model->find("all", array('conditions'=>array('user_id'=>$id)));
-        if (count($userRoleStudios) >= 1) {
+        if (count($userRoleStudios) > 1) {
             foreach ($userRoleStudios as $userRole) {
                 if ($this->isManagerForStudioRole($userRole)) return true;
             }
@@ -57,6 +67,7 @@ class UserHelper extends AppHelper {
     }
 
     private function isAdminForStudioRole($studioRole) {
+        $this->log($studioRole['UserRoleStudio']['role_id']);
         return ($studioRole['UserRoleStudio']['role_id'] == 5);
     }
 }
