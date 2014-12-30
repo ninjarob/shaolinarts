@@ -21,7 +21,7 @@
 		</td>
 		<td class="actions" style="font-size:8px;">
             <div style="width:90px">
-                <?php echo $this->Html->link(__('View'), array('action' => 'view', $manual['Manual']['id']), array('style'=>'font-size:8px;')); ?>
+                <?php echo $this->Html->link(__('View'), array('action' => 'show', $manual['Manual']['id']), array('style'=>'font-size:8px;', 'target'=>'_blank')); ?>
                 <?php echo $this->Html->link(__('Edit'), array('action' => 'edit', $manual['Manual']['id']), array('style'=>'font-size:8px;')); ?>
                 <?php echo $this->Form->postLink(__('Delete'), array('action' => 'delete', $manual['Manual']['id']), array('style'=>'font-size:8px;'), __('Are you sure you want to delete # %s?', $manual['Manual']['id'])); ?>
             </div>
