@@ -79,6 +79,8 @@ class ManualsController extends AppController {
 
 
 	public function add() {
+        $roleTypes = $this->Manual->RoleType->find('list');
+        $this->set(compact('roleTypes'));
 		if ($this->request->is('post') &&
 		    !empty($this->data) &&
             is_uploaded_file($this->data['Manual']['data']['tmp_name'])) {
@@ -86,11 +88,14 @@ class ManualsController extends AppController {
             //check size
             if ($this->data['Manual']['data']['size'] >= 16000000) {
                  $this->setFlashAndRedirect(Configure::read('Manual.tooBig'), null, true);
+                 return;
             }
             //check filetype
+            $this->log($this->data);
             $fileType = $this->data['Manual']['data']['type'];
-            if($fileType != "image/jpeg" ||$fileType != "image/gif" || $fileType != "image/png" || $fileType != "application/pdf") {
+            if($fileType != "image/jpeg" && $fileType != "image/gif" && $fileType != "image/png" && $fileType != "application/pdf") {
                 $this->setFlashAndRedirect(Configure::read('Manual.typeProblem'), null, true);
+                return;
             }
 
             //get data
@@ -118,8 +123,6 @@ class ManualsController extends AppController {
 		else if (!empty($this->data) && $this->data['Manual']['data']['size'] == 0) {
             $this->setFlashAndRedirect(Configure::read('Manual.typeProblem'), null, true);
 		}
-		$roleTypes = $this->Manual->RoleType->find('list');
-		$this->set(compact('roleTypes'));
 	}
 
 /**
