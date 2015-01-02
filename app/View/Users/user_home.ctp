@@ -67,7 +67,7 @@
         </div>
         <p style="text-align:center; font-weight:bold;">Account</p>
     </li>
-    <?php if ($this->User->isInstructor(AuthComponent::user('id'))) {  ?>
+    <?php if ($this->User->isAdmin(AuthComponent::user('id'))) {  ?>
     <li>
         <div style="height:190px;">
             <?php echo $this->Html->link($this->Html->image('userImages/admin.png', array('alt' => 'Account', 'border' => '0', 'width' => '225', 'style'=>'border:none;')), '/admin_pages/admin_home', array('escape' => false)) ?>

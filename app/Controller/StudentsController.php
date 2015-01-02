@@ -11,7 +11,7 @@ class StudentsController extends AppController {
     public $helpers = array('User','Js' => array('Jquery'));
     public function beforeFilter() {
         parent::beforeFilter();
-        $this->layout = 'user_admin';
+        $this->layout = 'user';
     }
 
     public function isAuthorized($user) {

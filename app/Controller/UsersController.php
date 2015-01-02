@@ -25,10 +25,10 @@ class UsersController extends AppController {
         }
         $userRoleStudio = $this->UserRoleStudio->find('first', array('conditions'=>array('user_id'=>$user['id'])));
         if (count($userRoleStudio)>0) {
-            if (in_array($this->action, array('learn', 'play', 'train', 'record'))) {
+            if (in_array($this->action, array('learn', 'play', 'train', 'record', 'account'))) {
                 return true;
             }
-            $userRoleStudio = $this->UserRoleStudio->find('first', array('conditions'=>array('user_id'=>$user['id'], 'role_id in'=>array(1, 3, 4, 5))));
+            $userRoleStudio = $this->UserRoleStudio->find('first', array('conditions'=>array('user_id'=>$user['id'], 'role_id = 5')));
             if (count($userRoleStudio)>0 && in_array($this->action, array('user_management', 'edit', 'delete', 'ajax_add_role', 'ajax_delete_role', 'activate', 'disable'))) {
                 return true;
             }
@@ -138,7 +138,28 @@ class UsersController extends AppController {
     }
 
     public function user_home() {}
-    public function account() {}
+    public function extra() {}
+    public function account() {
+        $id = $this->Auth->user('id');
+        $user = $this->userIdProblems($id);
+
+        if ($this->request->is('post') || $this->request->is('put')) {
+            $this->User->id = $id;
+            if ($user['User']['email'] == $this->request->data['User']['email']) {
+                unset($this->request->data['User']['email']);
+            }
+            if ($this->User->saveAll($this->request->data)) {
+                $this->setFlashAndRedirect(Configure::read('User.editSuccess'), null, false);
+                $this->redirect(array('action' => 'account', $id));
+            }else{
+                $this->setFlashAndRedirect(Configure::read('User.editFailed'));
+                $this->redirect(array('action' => 'account', $id));
+            }
+        }
+        if (!$this->request->data) {
+            $this->request->data = $user;
+        }
+    }
 
     public function add() {
         if($this->Session->check('Auth.User')){

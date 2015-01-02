@@ -57,11 +57,11 @@ class UserHelper extends AppHelper {
         $userRoleStudios = $model->find("all", array('conditions'=>array('user_id'=>$id)));
         if (count($userRoleStudios) > 1) {
             foreach ($userRoleStudios as $userRole) {
-                if ($this->isManagerForStudioRole($userRole)) return true;
+                if ($this->isAdminForStudioRole($userRole)) return true;
             }
         }
-        else {
-            return $this->isManagerForStudioRole($userRoleStudios);
+        else if (count($userRoleStudios) > 0) {
+            return $this->isAdminForStudioRole($userRoleStudios);
         }
         return false;
     }

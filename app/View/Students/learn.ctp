@@ -1,7 +1,7 @@
 <div class="manuals index">
     <h3 style="clear:none;margin-top:0px;">Learn</h3>
     <div style="float:right;">
-        <?php echo $this->Html->link( "Back to Admin", array('controller'=>'admin_pages', 'action'=>'admin_home'),array('escape' => false) ); ?>
+        <?php echo $this->Html->link( "Back Home", array('controller'=>'users', 'action'=>'user_home'),array('escape' => false) ); ?>
     </div>
 
     <table cellpadding="0" cellspacing="0" id="pattern-style-b">
