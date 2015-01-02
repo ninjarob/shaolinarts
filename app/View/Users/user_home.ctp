@@ -32,25 +32,25 @@
     <?php if ($this->User->isStudent(AuthComponent::user('id'))) {  ?>
     <li>
         <div style="height:190px;">
-            <?php echo $this->Html->link($this->Html->image('userImages/train.png', array('alt' => 'Train', 'border' => '0', 'height'=>'170', 'style'=>'border:none;')), '/users/train', array('escape' => false)) ?>
+            <?php echo $this->Html->link($this->Html->image('userImages/train.png', array('alt' => 'Train', 'border' => '0', 'height'=>'170', 'style'=>'border:none;')), '/students/train', array('escape' => false)) ?>
         </div>
         <p style="text-align:center; font-weight:bold; bottom:5px;">Train</p>
     </li>
     <li>
         <div style="height:190px;">
-            <?php echo $this->Html->link($this->Html->image('userImages/record.png', array('alt' => 'Record', 'border' => '0', 'width' => '225', 'style'=>'border:none;')), '/users/record', array('escape' => false)) ?>
+            <?php echo $this->Html->link($this->Html->image('userImages/record.png', array('alt' => 'Record', 'border' => '0', 'width' => '225', 'style'=>'border:none;')), '/students/record', array('escape' => false)) ?>
         </div>
         <p style="text-align:center; font-weight:bold; bottom:5px;">Record</p>
     </li>
     <li>
         <div style="height:190px;">
-            <?php echo $this->Html->link($this->Html->image('userImages/learn.png', array('alt' => 'Learn', 'border' => '0', 'width' => '225', 'style'=>'border:none;')), '/users/learn', array('escape' => false)) ?>
+            <?php echo $this->Html->link($this->Html->image('userImages/learn.png', array('alt' => 'Learn', 'border' => '0', 'width' => '225', 'style'=>'border:none;')), '/students/learn', array('escape' => false)) ?>
         </div>
         <p style="text-align:center; font-weight:bold; bottom:5px;">Learn</p>
     </li>
     <li>
         <div style="height:190px;">
-            <?php echo $this->Html->link($this->Html->image('userImages/play.png', array('alt' => 'Play', 'border' => '0', 'width' => '225', 'style'=>'border:none;')), '/users/play', array('escape' => false)) ?>
+            <?php echo $this->Html->link($this->Html->image('userImages/play.png', array('alt' => 'Play', 'border' => '0', 'width' => '225', 'style'=>'border:none;')), '/students/play', array('escape' => false)) ?>
         </div>
         <p style="text-align:center; font-weight:bold; bottom:5px;">Play</p>
     </li>

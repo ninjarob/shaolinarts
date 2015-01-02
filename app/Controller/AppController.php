@@ -118,11 +118,58 @@ class AppController extends Controller {
     }
 
 
+
+
+
     protected function setFlashAndRedirect($flashMessage, $redirectAction=null, $errorFlag=true, $appendString="") {
         $this->Session->setFlash(__($flashMessage).$appendString, 'default', array('class'=>$errorFlag?'flasherrormsg':'flashmsg'));
         if ($redirectAction != null) {
             $this->redirect(array('action' => $redirectAction));
         }
+    }
+
+    protected function getManualsWithAccess($id) {
+        $model = new UserRoleStudio();
+        $userRoleStudios = $model->find("all", array('conditions'=>array('user_id'=>$id)));
+        if (count($userRoleStudios) >= 1) {
+            $roleTypes = array();
+            $isAdmin = false;
+            foreach ($userRoleStudios as $userRole) {
+                if ($userRole['Role']['id']==5) {
+                    $isAdmin=true;
+                    break;
+                }
+                $roleTypes[] = $userRole['Role']['role_type_id'];
+            }
+            $manuals = array();
+            if (!$isAdmin) {
+                $manuals = $this->Manual->find('all', array('conditions'=>array('Manual.role_type_id'=>$roleTypes)));
+            }
+            else {
+                $manuals = $this->Manual->find('all');
+            }
+            return $manuals;
+        }
+        else {
+            return array();
+        }
+    }
+
+    protected function hasManualAccess($id, $manualRoleType) {
+        $model = new UserRoleStudio();
+        $userRoleStudios = $model->find("all", array('conditions'=>array('user_id'=>$id)));
+        if (count($userRoleStudios) >= 1) {
+            $roleTypes = array();
+            foreach ($userRoleStudios as $userRole) {
+                if ($userRole['Role']['id']==5) {
+                    return true;
+                }
+                if ($userRole['Role']['role_type_id'] == $manualRoleType) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
 }

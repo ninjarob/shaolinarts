@@ -1,8 +1,9 @@
 <?php
 App::uses('AppController', 'Controller');
 App::import('Vendor', 'PhpMailer', array('file' => 'phpmailer' . DS . 'PHPMailerAutoload.php'));
+App::import('Helper', 'UserHelper');
 class UsersController extends AppController {
-    public $uses = array('User', 'UserInfo', 'Role', 'Studio', 'UserRoleStudio', 'Status', 'Ticket');
+    public $uses = array('User', 'UserInfo', 'Role', 'Studio', 'UserRoleStudio', 'Status', 'Ticket', 'Manual');
     var $components = array('Tickets'); //  use component email
 
     public $helpers = array('User','Js' => array('Jquery'));
@@ -138,11 +139,6 @@ class UsersController extends AppController {
 
     public function user_home() {}
     public function account() {}
-    public function learn() {}
-    public function play() {}
-    public function train() {}
-    public function record() {}
-    public function extra() {}
 
     public function add() {
         if($this->Session->check('Auth.User')){

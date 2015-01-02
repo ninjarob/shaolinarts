@@ -21,6 +21,13 @@ class ManualsController extends AppController {
             if (count($userRoleStudio)>0 && in_array($this->action, array('index', 'view', 'add', 'edit', 'delete', 'show'))) {
                 return true;
             }
+            if (in_array($this->action, array('show', 'manual'))) {
+                $manual = $this->Manual->findById($this->request->params['pass'][0]);
+
+                if (count($manual) > 0 && $this->hasManualAccess($this->Auth->user('id'), $manual['Manual']['role_type_id'])) {
+                    return true;
+                }
+            }
         }
         return parent::isAuthorized($user);
     }
@@ -91,7 +98,6 @@ class ManualsController extends AppController {
                  return;
             }
             //check filetype
-            $this->log($this->data);
             $fileType = $this->data['Manual']['data']['type'];
             if($fileType != "image/jpeg" && $fileType != "image/gif" && $fileType != "image/png" && $fileType != "application/pdf") {
                 $this->setFlashAndRedirect(Configure::read('Manual.typeProblem'), null, true);
@@ -174,6 +180,13 @@ class ManualsController extends AppController {
 
 
 	function show($id) {
+	    $this->layout = null;
+        $this->set('manualId', $id);
+        $manual = $this->Manual->find('first', array('conditions' => array('Manual.id'=>$id), 'fields'=>array('Manual.name')));
+        $this->set('manualName', $manual['Manual']['name']);
+    }
+
+    function manual($id) {
         //set up a variable, so the view well knwo to show it, not prompt to download
         $this->set('inpage',true);
 
@@ -190,24 +203,7 @@ class ManualsController extends AppController {
         $this->set('file',$file);
 
         // we'll use our new layout, file,BUT well also use the same view, download
-        $this->render('manual','file');
-    }
-
-    function manual($id) {
-        $this->ProjectFile->recursive=-1;
-        $file = $this->Manual->findById($id);
-        Configure::write('debug', 0);
-       //just in case its been deleted, or someone is getting frisky
-        if(!isset($file['Manual']['name'])){
-            $this->Session->setFlash("Problem. Either;<ul><li>We no longer have that file</li><li>We never did.</li><li>You don't have rights</li></ul>", 'default', array('class'=>'flasherrormsg'));
-            $this->redirect('/');
-
-        }
-        //set the file variable up for use in our view
-        $this->set('file',$file);
-
-        // we'll use a new layout, file, that will allow custom headers
-        $this->render(null,'file');
+        $this->render(null, 'file');
     }
 
 

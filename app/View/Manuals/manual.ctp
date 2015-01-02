@@ -1,3 +1,3 @@
 <?php
-print $file['Manual']['data'];
+    print $file['Manual']['data'];
 ?>
