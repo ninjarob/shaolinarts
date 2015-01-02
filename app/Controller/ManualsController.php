@@ -62,15 +62,61 @@ class ManualsController extends AppController {
  *
  * @return void
  */
+// if (!empty($this->data) &&
+//              is_uploaded_file($this->data['MyFile']['File']['tmp_name'])) {
+//             $fileData = fread(fopen($this->data['MyFile']['File']['tmp_name'], "r"),
+//                                      $this->data['MyFile']['File']['size']);
+//
+//             $this->data['MyFile']['name'] = $this->data['MyFile']['File']['name'];
+//             $this->data['MyFile']['type'] = $this->data['MyFile']['File']['type'];
+//             $this->data['MyFile']['size'] = $this->data['MyFile']['File']['size'];
+//             $this->data['MyFile']['data'] = $fileData;
+//
+//             $this->MyFile->save($this->data);
+//
+//             $this->redirect('somecontroller/someaction');
+//         }
+
+
 	public function add() {
-		if ($this->request->is('post')) {
-			$this->Manual->create();
-			if ($this->Manual->save($this->request->data)) {
-				$this->Session->setFlash(__('The manual has been saved.'));
-				return $this->redirect(array('action' => 'index'));
-			} else {
-				$this->Session->setFlash(__('The manual could not be saved. Please, try again.'));
-			}
+		if ($this->request->is('post') &&
+		    !empty($this->data) &&
+            is_uploaded_file($this->data['Manual']['data']['tmp_name'])) {
+
+            //check size
+            if ($this->data['Manual']['data']['size'] >= 16000000) {
+                 $this->setFlashAndRedirect(Configure::read('Manual.tooBig'), null, true);
+            }
+            //check filetype
+            $fileType = $this->data['Manual']['data']['type'];
+            if($fileType != "image/jpeg" ||$fileType != "image/gif" || $fileType != "image/png" || $fileType != "application/pdf") {
+                $this->setFlashAndRedirect(Configure::read('Manual.typeProblem'), null, true);
+            }
+
+            //get data
+            $fileData = fread(fopen($this->data['Manual']['data']['tmp_name'], "r"), $this->data['Manual']['data']['size']);
+            $this->Manual->create();
+
+            //create manual object
+            $manual = array(
+                            'Manual'=>array('name'=>$this->data['Manual']['name'],
+                                            'description'=>$this->data['Manual']['description'],
+                                            'role_type_id'=>$this->data['Manual']['role_type_id'],
+                                            'type'=>$fileType,
+                                            'data'=>$fileData
+                                            )
+                            );
+
+            //save to the database
+            if ($this->Manual->save($manual)) {
+                $this->Session->setFlash(__('The manual has been saved.'));
+                return $this->redirect(array('action' => 'index'));
+            } else {
+                $this->setFlashAndRedirect(Configure::read('Manual.typeProblem'), null, true);
+            }
+		}
+		else if (!empty($this->data) && $this->data['Manual']['data']['size'] == 0) {
+            $this->setFlashAndRedirect(Configure::read('Manual.typeProblem'), null, true);
 		}
 		$roleTypes = $this->Manual->RoleType->find('list');
 		$this->set(compact('roleTypes'));

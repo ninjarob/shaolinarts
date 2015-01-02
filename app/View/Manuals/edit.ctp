@@ -1,25 +1,27 @@
 <div class="manuals form">
-<?php echo $this->Form->create('Manual'); ?>
-	<fieldset>
-		<legend><?php echo __('Edit Manual'); ?></legend>
-	<?php
-		echo $this->Form->input('id');
-		echo $this->Form->input('name');
-		echo $this->Form->input('description');
-		echo $this->Form->input('data');
-		echo $this->Form->input('type');
-		echo $this->Form->input('role_type_id');
-	?>
-	</fieldset>
-<?php echo $this->Form->end(__('Submit')); ?>
+<div style="float:right;">
+    <?php echo $this->Html->link( "Back to Manuals", array('controller'=>'manuals', 'action'=>'index'),array('escape' => false) ); ?>
 </div>
-<div class="actions">
-	<h3><?php echo __('Actions'); ?></h3>
-	<ul>
-
-		<li><?php echo $this->Form->postLink(__('Delete'), array('action' => 'delete', $this->Form->value('Manual.id')), null, __('Are you sure you want to delete # %s?', $this->Form->value('Manual.id'))); ?></li>
-		<li><?php echo $this->Html->link(__('List Manuals'), array('action' => 'index')); ?></li>
-		<li><?php echo $this->Html->link(__('List Role Types'), array('controller' => 'role_types', 'action' => 'index')); ?> </li>
-		<li><?php echo $this->Html->link(__('New Role Type'), array('controller' => 'role_types', 'action' => 'add')); ?> </li>
-	</ul>
+<?php echo __('Edit Manual'); ?>
+<?php echo $this->Form->create('Manual'); ?>
+    <ul class="list-group">
+        <?php echo $this->Form->hidden('id'); ?>
+        <li class="input-group list-group-item">
+            <?php echo $this->Session->flash('auth'); ?>
+            Please enter your username and password
+        </li>
+        <li class="input-group list-group-item">
+            <label style="display: block; float: left; width: 140px;">Name:</label>
+            <?php echo $this->Form->input('name', array('label'=>'', 'style'=>'width:300px')); ?>
+        </li>
+        <li class="input-group list-group-item">
+            <label style="display: block; float: left; width: 140px;">Description:</label>
+            <?php echo $this->Form->textarea('description', array('label'=>'', 'cols'=>'50', 'rows'=>5)); ?>
+        </li>
+        <li class="input-group list-group-item">
+            <label style="display: block; float: left; width: 140px;">Access Role Type:</label>
+            <?php echo $this->Form->input('role_type_id', array('label'=>'')); ?>
+        </li>
+    </ul>
+<?php echo $this->Form->end(__('Submit')); ?>
 </div>

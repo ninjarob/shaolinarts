@@ -117,4 +117,12 @@ class AppController extends Controller {
         //}
     }
 
+
+    protected function setFlashAndRedirect($flashMessage, $redirectAction=null, $errorFlag=true, $appendString="") {
+        $this->Session->setFlash(__($flashMessage).$appendString, 'default', array('class'=>$errorFlag?'flasherrormsg':'flashmsg'));
+        if ($redirectAction != null) {
+            $this->redirect(array('action' => $redirectAction));
+        }
+    }
+
 }

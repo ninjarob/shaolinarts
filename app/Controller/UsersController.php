@@ -55,7 +55,7 @@ class UsersController extends AppController {
                     if ($user['User']['status_id'] == 1) {
                         $resendLink = ' <a href="resendEmailForNewUser/'.$this->Auth->user('id').'" style="font-size:10px;">(Resend Email)</a>';
                         $this->Auth->logout();
-                        $this->setFlashAndRedirect(Configure::read('User.loginFailedEmailReg'), 'login', true, $resendLink);
+                        $this->setFlashAndRedirect(Configure::read('Manual.tooBig'), 'login', true, $resendLink);
                     }
                     else {
                         $this->Auth->logout();
@@ -484,13 +484,6 @@ class UsersController extends AppController {
             $studios = $userRoleStudios['UserRoleStudio']['studio_id'];
         }
         return trim($studios);
-    }
-
-    private function setFlashAndRedirect($flashMessage, $redirectAction=null, $errorFlag=true, $appendString="") {
-        $this->Session->setFlash(__($flashMessage).$appendString, 'default', array('class'=>$errorFlag?'flasherrormsg':'flashmsg'));
-        if ($redirectAction != null) {
-            $this->redirect(array('action' => $redirectAction));
-        }
     }
 
     private function userIdProblems($id) {

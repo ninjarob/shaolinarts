@@ -1,23 +1,26 @@
 <div class="manuals form">
-<?php echo $this->Form->create('Manual'); ?>
-	<fieldset>
-		<legend><?php echo __('Add Manual'); ?></legend>
-	<?php
-		echo $this->Form->input('name');
-		echo $this->Form->input('description');
-		echo $this->Form->input('data');
-		echo $this->Form->input('type');
-		echo $this->Form->input('role_type_id');
-	?>
-	</fieldset>
-<?php echo $this->Form->end(__('Submit')); ?>
+<div style="float:right;">
+    <?php echo $this->Html->link( "Back to Manuals", array('controller'=>'manuals', 'action'=>'index'),array('escape' => false) ); ?>
 </div>
-<div class="actions">
-	<h3><?php echo __('Actions'); ?></h3>
-	<ul>
-
-		<li><?php echo $this->Html->link(__('List Manuals'), array('action' => 'index')); ?></li>
-		<li><?php echo $this->Html->link(__('List Role Types'), array('controller' => 'role_types', 'action' => 'index')); ?> </li>
-		<li><?php echo $this->Html->link(__('New Role Type'), array('controller' => 'role_types', 'action' => 'add')); ?> </li>
-	</ul>
+<?php echo __('Add Manual'); ?>
+<?php echo $this->Form->create('Manual', array('type' => 'file')); ?>
+    <ul class="list-group">
+        <li class="input-group list-group-item">
+            <label style="display: block; float: left; width: 140px;">Name:</label>
+            <?php echo $this->Form->input('name', array('label'=>'', 'style'=>'width:300px')); ?>
+        </li>
+        <li class="input-group list-group-item">
+            <label style="display: block; float: left; width: 140px;">Description:</label>
+            <?php echo $this->Form->textarea('description', array('label'=>'', 'cols'=>'50', 'rows'=>5)); ?>
+        </li>
+        <li class="input-group list-group-item">
+            <label style="display: block; float: left; width: 140px;">File:</label>
+            <?php echo $this->Form->input('data', array('type'=>'file', 'accept'=>'image/jpeg,image/gif,image/png,application/pdf', 'label'=>'')); ?>
+        </li>
+        <li class="input-group list-group-item">
+            <label style="display: block; float: left; width: 140px;">Access Role Type:</label>
+            <?php echo $this->Form->input('role_type_id', array('label'=>'')); ?>
+        </li>
+    </ul>
+<?php echo $this->Form->end(__('Submit')); ?>
 </div>
