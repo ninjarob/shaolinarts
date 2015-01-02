@@ -21,11 +21,5 @@ class AdminPagesController extends AppController {
     function admin_home() {
 
     }
-
-    function manual_management() {
-    }
-
-    function role_management() {
-    }
 }
 ?>
