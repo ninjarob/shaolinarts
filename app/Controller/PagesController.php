@@ -48,19 +48,5 @@ class PagesController extends AppController {
 			throw new NotFoundException();
 		}
 	}
-
-    function sendContactMessage() {
-        if ($this->request->is('post')) {
-            $this->Contact->set($this->data);
-            if ($this->Contact->validates()) {
-                //send email using the Email component
-                $this->Email->to = 'robatmywork@gmail.com';
-                $this->Email->subject = 'Contact message from ' . $this->data['Contact']['name'] . ' in the city of' . $this->data['Contact']['city'];
-                $this->Email->from = $this->data['Contact']['email'];
-
-                $this->Email->send($this->data['Contact']['message']);
-            }
-        }
-    }
 }
 ?>
