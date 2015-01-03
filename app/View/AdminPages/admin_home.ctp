@@ -8,7 +8,7 @@
         <?php echo $this->Html->link('Manual Management', '/manuals/index') ?>
     </li>
     <li class="input-group list-group-item">
-        <?php echo $this->Html->link('Role Management', '/admin_pages/role_management') ?>
+        <?php echo $this->Html->link('Role Management', '/roles') ?>
     </li>
     <?php }?>
 </ul>

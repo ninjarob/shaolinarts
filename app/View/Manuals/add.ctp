@@ -2,7 +2,7 @@
 <div style="float:right;">
     <?php echo $this->Html->link( "Back to Manuals", array('controller'=>'manuals', 'action'=>'index'),array('escape' => false) ); ?>
 </div>
-<?php echo __('Add Manual'); ?>
+<h3 style="clear:none;margin-top:0px;"><?php echo __('Add Manual'); ?></h3>
 <?php echo $this->Form->create('Manual', array('type' => 'file')); ?>
     <ul class="list-group">
         <li class="input-group list-group-item">

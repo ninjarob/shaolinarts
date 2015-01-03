@@ -1,20 +1,20 @@
 <div class="roles form">
-<?php echo $this->Form->create('Role'); ?>
-	<fieldset>
-		<legend><?php echo __('Edit Role'); ?></legend>
-	<?php
-		echo $this->Form->input('id');
-		echo $this->Form->input('name');
-		echo $this->Form->input('role_type_id');
-	?>
-	</fieldset>
-<?php echo $this->Form->end(__('Submit')); ?>
-</div>
-<div class="actions">
-	<h3><?php echo __('Actions'); ?></h3>
-	<ul>
-
-		<li><?php echo $this->Form->postLink(__('Delete'), array('action' => 'delete', $this->Form->value('Role.id')), null, __('Are you sure you want to delete # %s?', $this->Form->value('Role.id'))); ?></li>
-		<li><?php echo $this->Html->link(__('List Roles'), array('action' => 'index')); ?></li>
-	</ul>
+    <div style="float:right;">
+        <?php echo $this->Html->link( "Back to Roles", array('controller'=>'roles', 'action'=>'index'),array('escape' => false) ); ?>
+    </div>
+    <h3 style="clear:none;margin-top:0px;"><?php echo __('Edit Role'); ?></h3>
+    <?php echo $this->Form->create('Role'); ?>
+    <ul class="list-group">
+        <?php echo $this->Session->flash('auth'); ?>
+        <?php echo $this->Form->input('id'); ?>
+        <li class="input-group list-group-item">
+            <label style="display: block; float: left; width: 140px;">Name:</label>
+            <?php echo $this->Form->input('name', array('label'=>'', 'style'=>'width:300px')); ?>
+        </li>
+        <li class="input-group list-group-item">
+            <label style="display: block; float: left; width: 140px;">Access Role Type:</label>
+            <?php echo $this->Form->input('role_type_id', array('label'=>'')); ?>
+        </li>
+    </ul>
+    <?php echo $this->Form->end(__('Submit')); ?>
 </div>
