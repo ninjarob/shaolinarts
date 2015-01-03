@@ -8,7 +8,6 @@ class PagesController extends AppController {
  * @var array
  */
 	public $uses = array('Contact', 'ContentForPage');
-    public $helpers = array('form');
 
     function beforeFilter() {
         parent::beforeFilter();
