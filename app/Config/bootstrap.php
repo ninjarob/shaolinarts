@@ -131,6 +131,9 @@ Configure::write('User.loginFailed', 'There was a problem processing your login.
 Configure::write('User.loginFailedEmailReg', 'Pending email activation.  Please look in your email inbox for an email with instructions to activate your account with ShaolinArts.com.');
 Configure::write('User.confirmRegistrationFailed', 'There was a problem confirming your user account.  If the problem persists, please contact the system administrator.');
 
+Configure::write('User.emailVerificationSubject', 'ShaolinArts.com email verification');
+Configure::write('User.emailVerificationBody', 'Please click the following link to verify your ShaolinArts.com user account.  ');
+
 Configure::write('Manual.generalProblem', 'There was a problem uploading the file.');
 Configure::write('Manual.typeProblem', 'Only the following file types are accepted (pdf, gif, jpeg, png).');
 Configure::write('Manual.tooBig', 'This file is too big.  Please only submit files that are 16M or less.');

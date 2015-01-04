@@ -15,9 +15,11 @@
 	<tr>
 		<td><?php echo h($role['Role']['name']); ?>&nbsp;</td>
 		<td><?php echo h($role['RoleType']['name']); ?>&nbsp;</td>
-		<td class="actions">
-			<?php echo $this->Html->link(__('Edit'), array('action' => 'edit', $role['Role']['id'])); ?>
-			<?php echo $this->Form->postLink(__('Delete'), array('action' => 'delete', $role['Role']['id']), null, __('Are you sure you want to delete # %s?', $role['Role']['id'])); ?>
+        <td class="actions" style="font-size:8px;">
+            <div style="width:90px">
+                <?php echo $this->Html->link(__('Edit'), array('action' => 'edit', $role['Role']['id'])); ?>
+                <?php echo $this->Form->postLink(__('Delete'), array('action' => 'delete', $role['Role']['id']), null, __('Are you sure you want to delete # %s?', $role['Role']['id'])); ?>
+            </div>
 		</td>
 	</tr>
 <?php endforeach; ?>

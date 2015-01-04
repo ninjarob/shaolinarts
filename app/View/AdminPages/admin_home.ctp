@@ -10,5 +10,8 @@
     <li class="input-group list-group-item">
         <?php echo $this->Html->link('Role Management', '/roles') ?>
     </li>
+    <li class="input-group list-group-item">
+        <?php echo $this->Html->link('System Properties', '/systemProperties') ?>
+    </li>
     <?php }?>
 </ul>

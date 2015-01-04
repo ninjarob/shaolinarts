@@ -172,4 +172,82 @@ class AppController extends Controller {
         return false;
     }
 
+    protected function sendEmail($to, $subject, $body) {
+
+        $mail = new PHPMailer(true);
+
+        $emailPassThroughAddress = $this->SystemProperty->findByName("pass_through_email_account")['SystemProperty']['value'];
+        $emailPassThroughFrom = $this->SystemProperty->findByName("pass_through_email_from")['SystemProperty']['value'];
+        $emailPassThroughPw = $this->SystemProperty->findByName("pass_through_email_account_pw")['SystemProperty']['value'];
+        $smtpHost = $this->SystemProperty->findByName("smtp_host")['SystemProperty']['value'];
+        $smtpPort = $this->SystemProperty->findByName("smtp_port")['SystemProperty']['value'];
+
+        //Send mail using gmail
+        if(true){
+            $mail->IsSMTP(); // telling the class to use SMTP
+            $mail->SMTPAuth = true; // enable SMTP authentication
+            $mail->SMTPSecure = "ssl"; // sets the prefix to the servier
+            $mail->Host = $smtpHost; // sets GMAIL as the SMTP server
+            $mail->Port = $smtpPort ; // set the SMTP port for the GMAIL server
+            $mail->Username = $emailPassThroughAddress; // GMAIL username
+            $mail->Password = $emailPassThroughPw; // GMAIL password
+        }
+
+        //Typical mail data
+        $mail->AddAddress($to);
+        $mail->SetFrom($emailPassThroughAddress, $emailPassThroughFrom);
+        $mail->Subject = $subject;
+        $mail->Body = $body;
+        try{
+            $containsBadStuff = false;
+            $containsBadStuff = $containsBadStuff && contains_bad_str($to);
+            $containsBadStuff = $containsBadStuff && contains_bad_str($subject);
+            $containsBadStuff = $containsBadStuff && contains_bad_str($body);
+
+            $containsBadStuff = $containsBadStuff && contains_newlines($subject);
+            $containsBadStuff = $containsBadStuff && contains_newlines($body);
+
+            if (!$containsBadStuff) {
+                $mail->Send();
+            }
+            else {
+                $this->log("There was a problem with the email process.");
+            }
+            return true;
+        } catch(Exception $e){
+            //Something went bad
+            $this->log("There was a problem with the email process.".$mail);
+            $this->log($e);
+        }
+        return false;
+    }
+
+    private function contains_bad_str($str_to_test) {
+        $bad_strings = array(
+                    "content-type:"
+                    ,"mime-version:"
+                    ,"multipart/mixed"
+                    ,"Content-Transfer-Encoding:"
+                    ,"bcc:"
+                    ,"cc:"
+                    ,"to:"
+        );
+
+        foreach($bad_strings as $bad_string) {
+            if(eregi($bad_string, strtolower($str_to_test))) {
+                $this->log("Contains a Bad String");
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function contains_newlines($str_to_test) {
+       if(preg_match("/(%0A|%0D|\\n+|\\r+)/i", $str_to_test) != 0) {
+            $this->log("Contains a Newline");
+         return false;
+       }
+       return true;
+    }
+
 }

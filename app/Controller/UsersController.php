@@ -3,7 +3,7 @@ App::uses('AppController', 'Controller');
 App::import('Vendor', 'PhpMailer', array('file' => 'phpmailer' . DS . 'PHPMailerAutoload.php'));
 App::import('Helper', 'UserHelper');
 class UsersController extends AppController {
-    public $uses = array('User', 'UserInfo', 'Role', 'Studio', 'UserRoleStudio', 'Status', 'Ticket', 'Manual');
+    public $uses = array('User', 'UserInfo', 'Role', 'Studio', 'UserRoleStudio', 'Status', 'Ticket', 'Manual', 'SystemProperty');
     var $components = array('Tickets'); //  use component email
 
     public $helpers = array('User','Js' => array('Jquery'));
@@ -419,34 +419,7 @@ class UsersController extends AppController {
 
         $ticket = $this->Tickets->set($user['User']['email']);
         $messageLink = 'https://'.$_SERVER['HTTP_HOST'].$this->webroot.$this->params['controller'].'/userRegisterConfirm/'.$ticket;
-
-        $mail = new PHPMailer(true);
-
-        //Send mail using gmail
-        if(true){
-            $mail->IsSMTP(); // telling the class to use SMTP
-            $mail->SMTPAuth = true; // enable SMTP authentication
-            $mail->SMTPSecure = "ssl"; // sets the prefix to the servier
-            $mail->Host = "smtp.gmail.com"; // sets GMAIL as the SMTP server
-            $mail->Port = 465; // set the SMTP port for the GMAIL server
-            $mail->Username = "shaolinartsemailpta@gmail.com"; // GMAIL username
-            $mail->Password = "KungFuPanda"; // GMAIL password
-        }
-
-        //Typical mail data
-        $mail->AddAddress($user['User']['email']);
-        $mail->SetFrom("shaolinartsemailpta@gmail.com", "Robert Kevan");
-        $mail->Subject = "ShaolinArts.com email verification";
-        $mail->Body = "Please click the following link to verify your ShaolinArts.com user account.  ".$messageLink;
-        try{
-            $mail->Send();
-            return true;
-        } catch(Exception $e){
-            //Something went bad
-            $this->log("There was a problem sending an email for the new user. ".$mail);
-            $this->log($e);
-        }
-        return false;
+        return $this->sendEmail($user['User']['email'], Configure::read('User.emailVerificationSubject'), Configure::read('User.emailVerificationBody').$messageLink);
     }
 
     private function setupUserSearchConditions($fnameFilter, $lnameFilter, $mroleFilter, $kfroleFilter, $tcroleFilter, $studioFilter, $statusFilter) {

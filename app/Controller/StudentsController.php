@@ -8,7 +8,7 @@ App::import('Vendor', 'PhpMailer', array('file' => 'phpmailer' . DS . 'PHPMailer
  * @property PaginatorComponent $Paginator
  */
 class StudentsController extends AppController {
-    public $uses = array('Manual', 'User', 'Role', 'Studio', 'UserRoleStudio');
+    public $uses = array('Manual', 'User', 'Role', 'Studio', 'UserRoleStudio', 'SystemProperty');
     public $helpers = array('User','Js' => array('Jquery'));
     public function beforeFilter() {
         parent::beforeFilter();
@@ -37,35 +37,9 @@ class StudentsController extends AppController {
     public function extra() {}
 
     public function sendContactMessage() {
-        $mail = new PHPMailer(true);
-        //Send mail using gmail
-        if(true){
-            $mail->IsSMTP(); // telling the class to use SMTP
-            $mail->SMTPAuth = true; // enable SMTP authentication
-            $mail->SMTPSecure = "ssl"; // sets the prefix to the servier
-            $mail->Host = "smtp.gmail.com"; // sets GMAIL as the SMTP server
-            $mail->Port = 465; // set the SMTP port for the GMAIL server
-            $mail->Username = "shaolinartsemailpta@gmail.com"; // GMAIL username
-            $mail->Password = "KungFuPanda"; // GMAIL password
-        }
-
-        //Typical mail data
-        //$mail->AddAddress('sandystudio@shaolinarts.com');
-        $mail->AddAddress('robatmywork@gmail.com');
-        $mail->SetFrom("shaolinartsemailpta@gmail.com", "Robert Kevan");
-        $mail->Subject = "Contact Form: ".$this->request->data['Contact']['subject'];
-        $mail->Body = $this->request->data['Contact']['body'];
-        try{
-            $mail->Send();
-            $this->Session->setFlash(__("Thankyou."), 'default', array('class'=>'flashmsg'));
-            $this->redirect(array('controller'=>'pages', 'action' => 'contactUs'));
-        } catch(Exception $e){
-            //Something went bad
-            $this->log("There was a problem sending the contact email: ".$mail);
-            $this->log($e);
-        }
+        $contactUsEmail  = $this->SystemProperty->findByName("contact_us_email")['SystemProperty']['value'];
+        $this->sendEmail($contactUsEmail, "Contact Form: ".$this->request->data['Contact']['subject'], $this->request->data['Contact']['body']);
         $this->Session->setFlash(__("Thankyou."), 'default', array('class'=>'flashmsg'));
         $this->redirect(array('controller'=>'pages', 'action' => 'contactUs'));
     }
-
 }
