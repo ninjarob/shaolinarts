@@ -425,7 +425,8 @@ class UsersController extends AppController {
     }
 
     private function sendEmailToNotifyOfNewUser($email) {
-        $contactUsEmail  = $this->SystemProperty->findByName("new_user_notification_email")['SystemProperty']['value'];
+        $new_user_notification_email = $this->SystemProperty->findByName("new_user_notification_email");
+        $contactUsEmail  = $new_user_notification_email['SystemProperty']['value'];
 
         $cem = $this->CommonEmailMessage->findByName("new_user_notification_email");
         $subject = $cem['CommonEmailMessage']['subject'];

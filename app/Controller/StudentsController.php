@@ -37,7 +37,8 @@ class StudentsController extends AppController {
     public function extra() {}
 
     public function sendContactMessage() {
-        $contactUsEmail  = $this->SystemProperty->findByName("contact_us_email")['SystemProperty']['value'];
+        $contact_us_email = $this->SystemProperty->findByName("contact_us_email");
+        $contactUsEmail  = $contact_us_email['SystemProperty']['value'];
         if ($this->request->is('post')) {
             $this->sendEmail($contactUsEmail, "Contact Form: ".$this->request->data['Contact']['subject'], $this->request->data['Contact']['body']);
         }

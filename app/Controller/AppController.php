@@ -174,12 +174,19 @@ class AppController extends Controller {
 
     protected function sendEmail($to, $subject, $body) {
         $mail = new PHPMailer(true);
+        $pass_through_email_account = $this->SystemProperty->findByName("pass_through_email_account");
+        $pass_through_email_from = $this->SystemProperty->findByName("pass_through_email_from");
+        $pass_through_email_account_pw = $this->SystemProperty->findByName("pass_through_email_account_pw");
+        $smtp_host = $this->SystemProperty->findByName("smtp_host");
+        $smtp_port = $this->SystemProperty->findByName("smtp_port");
 
-        $emailPassThroughAddress = $this->SystemProperty->findByName("pass_through_email_account")['SystemProperty']['value'];
-        $emailPassThroughFrom = $this->SystemProperty->findByName("pass_through_email_from")['SystemProperty']['value'];
-        $emailPassThroughPw = $this->SystemProperty->findByName("pass_through_email_account_pw")['SystemProperty']['value'];
-        $smtpHost = $this->SystemProperty->findByName("smtp_host")['SystemProperty']['value'];
-        $smtpPort = $this->SystemProperty->findByName("smtp_port")['SystemProperty']['value'];
+
+
+        $emailPassThroughAddress = ['SystemProperty']['value'];
+        $emailPassThroughFrom = $pass_through_email_from['SystemProperty']['value'];
+        $emailPassThroughPw = $pass_through_email_account_pw['SystemProperty']['value'];
+        $smtpHost = $smtp_host['SystemProperty']['value'];
+        $smtpPort = $smtp_port['SystemProperty']['value'];
 
         //Send mail using gmail
         if(true){
