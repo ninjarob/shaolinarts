@@ -7,10 +7,10 @@
 <ul class="list-group">
     <?php echo $this->Session->flash('auth'); ?>
     <?php echo $this->Form->input('id'); ?>
-    <li class="input-group list-group-item">
-        <label style="display: block; float: left; width: 140px;">Name:</label>
-        <?php echo $this->Form->input('name', array('label'=>'', 'style'=>'width:300px')); ?>
-    </li>
+        <li class="input-group list-group-item">
+            <label style="display: block; float: left; width: 140px;">Name:</label>
+            <?php echo $this->request->data['SystemProperty']['name'] ?>
+        </li>
     <li class="input-group list-group-item">
         <label style="display: block; float: left; width: 140px;">Value:</label>
         <?php echo $this->Form->input('value', array('label'=>'')); ?>

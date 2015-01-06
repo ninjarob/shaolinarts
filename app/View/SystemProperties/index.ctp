@@ -18,7 +18,6 @@
             <td class="actions" style="font-size:8px;">
                 <div style="width:90px">
                     <?php echo $this->Html->link(__('Edit'), array('action' => 'edit', $systemProperty['SystemProperty']['id'])); ?>
-                    <?php echo $this->Form->postLink(__('Delete'), array('action' => 'delete', $systemProperty['SystemProperty']['id']), null, __('Are you sure you want to delete # %s?', $systemProperty['SystemProperty']['id'])); ?>
                 </div>
             </td>
         </tr>
