@@ -219,6 +219,9 @@
 		'defaults' => 'php'
 	));
 
+    Configure::write('Session.checkAgent', false);
+    Configure::write('Session.ini',array('session.cookie_secure' => false, 'session.referer_check' => false));
+
 /**
  * A random string used in security hashing methods.
  */
