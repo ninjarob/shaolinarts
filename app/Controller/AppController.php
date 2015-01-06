@@ -182,7 +182,7 @@ class AppController extends Controller {
 
 
 
-        $emailPassThroughAddress = ['SystemProperty']['value'];
+        $emailPassThroughAddress = $pass_through_email_account['SystemProperty']['value'];
         $emailPassThroughFrom = $pass_through_email_from['SystemProperty']['value'];
         $emailPassThroughPw = $pass_through_email_account_pw['SystemProperty']['value'];
         $smtpHost = $smtp_host['SystemProperty']['value'];
