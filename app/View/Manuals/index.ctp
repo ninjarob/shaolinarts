@@ -1,5 +1,5 @@
 <div class="manuals index">
-    <h3 style="clear:none;margin-top:0px;">User Management</h3>
+    <h3 style="clear:none;margin-top:0px;">Manual Management</h3>
     <div style="float:right;">
         <?php echo $this->Html->link( "Back to Admin", array('controller'=>'admin_pages', 'action'=>'admin_home'),array('escape' => false) ); ?>
     </div>

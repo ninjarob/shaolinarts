@@ -196,23 +196,15 @@ class UsersController extends AppController {
                     }
                 }
                 else {
-//                    $newId = $this->User->id;
-//                    $ursData = array('User'=>array('id'=>$newId), 'Role'=>array('id'=>6), 'Studio'=>array('id'=>2));
-//                    if ($this->UserRoleStudio->saveAll($ursData)) {
-                        //send email
-                        $mailSent = $this->sendEmailForNewUser($this->User->id);
-                        if ($mailSent) {
-                            $this->setFlashAndRedirect(Configure::read('User.successfullyRegistered'), 'login', false);
-                        }
-                        else {
-                            $this->rollBackAddUser();
-                            $this->setFlashAndRedirect(Configure::read('User.failedRegistration'), 'login');
-                        }
-//                    }
-//                    else {
-//                        $this->rollBackAddUser();
-//                        $this->setFlashAndRedirect(Configure::read('User.failedRegistration'), 'login');
-//                    }
+                    $mailSent = $this->sendEmailForNewUser($this->User->id);
+                    if ($mailSent) {
+                        $mailSent = $this->sendEmailToNotifyOfNewUser($this->User->id);
+                        $this->setFlashAndRedirect(Configure::read('User.successfullyRegistered'), 'login', false);
+                    }
+                    else {
+                        $this->rollBackAddUser();
+                        $this->setFlashAndRedirect(Configure::read('User.failedRegistration'), 'login');
+                    }
                 }
             } else {
                 if (!empty($this->User->validationErrors))
@@ -420,6 +412,9 @@ class UsersController extends AppController {
         $ticket = $this->Tickets->set($user['User']['email']);
         $messageLink = 'https://'.$_SERVER['HTTP_HOST'].$this->webroot.$this->params['controller'].'/userRegisterConfirm/'.$ticket;
         return $this->sendEmail($user['User']['email'], Configure::read('User.emailVerificationSubject'), Configure::read('User.emailVerificationBody').$messageLink);
+    }
+
+    private function sendEmailToNotifyOfNewUser($userId) {
     }
 
     private function setupUserSearchConditions($fnameFilter, $lnameFilter, $mroleFilter, $kfroleFilter, $tcroleFilter, $studioFilter, $statusFilter) {
