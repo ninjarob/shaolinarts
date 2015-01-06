@@ -173,55 +173,50 @@ class AppController extends Controller {
     }
 
     protected function sendEmail($to, $subject, $body) {
-        if ($this->request->is('post')) {
-            $mail = new PHPMailer(true);
+        $mail = new PHPMailer(true);
 
-            $emailPassThroughAddress = $this->SystemProperty->findByName("pass_through_email_account")['SystemProperty']['value'];
-            $emailPassThroughFrom = $this->SystemProperty->findByName("pass_through_email_from")['SystemProperty']['value'];
-            $emailPassThroughPw = $this->SystemProperty->findByName("pass_through_email_account_pw")['SystemProperty']['value'];
-            $smtpHost = $this->SystemProperty->findByName("smtp_host")['SystemProperty']['value'];
-            $smtpPort = $this->SystemProperty->findByName("smtp_port")['SystemProperty']['value'];
+        $emailPassThroughAddress = $this->SystemProperty->findByName("pass_through_email_account")['SystemProperty']['value'];
+        $emailPassThroughFrom = $this->SystemProperty->findByName("pass_through_email_from")['SystemProperty']['value'];
+        $emailPassThroughPw = $this->SystemProperty->findByName("pass_through_email_account_pw")['SystemProperty']['value'];
+        $smtpHost = $this->SystemProperty->findByName("smtp_host")['SystemProperty']['value'];
+        $smtpPort = $this->SystemProperty->findByName("smtp_port")['SystemProperty']['value'];
 
-            //Send mail using gmail
-            if(true){
-                $mail->IsSMTP(); // telling the class to use SMTP
-                $mail->SMTPAuth = true; // enable SMTP authentication
-                $mail->SMTPSecure = "ssl"; // sets the prefix to the servier
-                $mail->Host = $smtpHost; // sets GMAIL as the SMTP server
-                $mail->Port = $smtpPort ; // set the SMTP port for the GMAIL server
-                $mail->Username = $emailPassThroughAddress; // GMAIL username
-                $mail->Password = $emailPassThroughPw; // GMAIL password
-            }
-
-            //Typical mail data
-            $mail->AddAddress($to);
-            $mail->SetFrom($emailPassThroughAddress, $emailPassThroughFrom);
-            $mail->Subject = $subject;
-            $mail->Body = $body;
-            try{
-                $containsBadStuff = false;
-                $containsBadStuff = $containsBadStuff && contains_bad_str($to);
-                $containsBadStuff = $containsBadStuff && contains_bad_str($subject);
-                $containsBadStuff = $containsBadStuff && contains_bad_str($body);
-
-                $containsBadStuff = $containsBadStuff && contains_newlines($subject);
-                $containsBadStuff = $containsBadStuff && contains_newlines($body);
-
-                if (!$containsBadStuff) {
-                    $mail->Send();
-                }
-                else {
-                    $this->log("There was a problem with the email process.");
-                }
-                return true;
-            } catch(Exception $e){
-                //Something went bad
-                $this->log("There was a problem with the email process.".$mail);
-                $this->log($e);
-            }
+        //Send mail using gmail
+        if(true){
+            $mail->IsSMTP(); // telling the class to use SMTP
+            $mail->SMTPAuth = true; // enable SMTP authentication
+            $mail->SMTPSecure = "ssl"; // sets the prefix to the servier
+            $mail->Host = $smtpHost; // sets GMAIL as the SMTP server
+            $mail->Port = $smtpPort ; // set the SMTP port for the GMAIL server
+            $mail->Username = $emailPassThroughAddress; // GMAIL username
+            $mail->Password = $emailPassThroughPw; // GMAIL password
         }
-        else {
+
+        //Typical mail data
+        $mail->AddAddress($to);
+        $mail->SetFrom($emailPassThroughAddress, $emailPassThroughFrom);
+        $mail->Subject = $subject;
+        $mail->Body = $body;
+        try{
+            $containsBadStuff = false;
+            $containsBadStuff = $containsBadStuff && contains_bad_str($to);
+            $containsBadStuff = $containsBadStuff && contains_bad_str($subject);
+            $containsBadStuff = $containsBadStuff && contains_bad_str($body);
+
+            $containsBadStuff = $containsBadStuff && contains_newlines($subject);
+            $containsBadStuff = $containsBadStuff && contains_newlines($body);
+
+            if (!$containsBadStuff) {
+                $mail->Send();
+            }
+            else {
+                $this->log("There was a problem with the email process.");
+            }
+            return true;
+        } catch(Exception $e){
+            //Something went bad
             $this->log("There was a problem with the email process.".$mail);
+            $this->log($e);
         }
         return false;
     }

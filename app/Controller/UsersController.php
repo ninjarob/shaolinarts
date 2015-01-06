@@ -3,7 +3,7 @@ App::uses('AppController', 'Controller');
 App::import('Vendor', 'PhpMailer', array('file' => 'phpmailer' . DS . 'PHPMailerAutoload.php'));
 App::import('Helper', 'UserHelper');
 class UsersController extends AppController {
-    public $uses = array('User', 'UserInfo', 'Role', 'Studio', 'UserRoleStudio', 'Status', 'Ticket', 'Manual', 'SystemProperty');
+    public $uses = array('User', 'UserInfo', 'Role', 'Studio', 'UserRoleStudio', 'Status', 'Ticket', 'Manual', 'SystemProperty', 'CommonEmailMessage');
     var $components = array('Tickets'); //  use component email
 
     public $helpers = array('User','Js' => array('Jquery'));
@@ -198,7 +198,6 @@ class UsersController extends AppController {
                 else {
                     $mailSent = $this->sendEmailForNewUser($this->User->id);
                     if ($mailSent) {
-                        $mailSent = $this->sendEmailToNotifyOfNewUser($this->User->id);
                         $this->setFlashAndRedirect(Configure::read('User.successfullyRegistered'), 'login', false);
                     }
                     else {
@@ -317,7 +316,8 @@ class UsersController extends AppController {
                 if ($this->User->saveField('status_id', 3))
                 {
                     $this->Tickets->del($hash);
-                    $this->setFlashAndRedirect('Congratulations!  Your account has been officially registered with ShaolinArts.com!  You may log in.', 'login', false);
+                    $mailSent = $this->sendEmailToNotifyOfNewUser($email);
+                    $this->setFlashAndRedirect(Configure::read('User.successfullyVerified'), 'login', false);
                 }else{
                     $this->setFlashAndRedirect(Configure::read('User.confirmRegistrationFailed'), 'login', true);
                 }
@@ -407,14 +407,31 @@ class UsersController extends AppController {
             $this->log("User doesn't exist. ");
             return false;
         }
-        $user = $this->User->findById($userId);
+        if ($this->request->is('post')) {
+            $user = $this->User->findById($userId);
 
-        $ticket = $this->Tickets->set($user['User']['email']);
-        $messageLink = 'https://'.$_SERVER['HTTP_HOST'].$this->webroot.$this->params['controller'].'/userRegisterConfirm/'.$ticket;
-        return $this->sendEmail($user['User']['email'], Configure::read('User.emailVerificationSubject'), Configure::read('User.emailVerificationBody').$messageLink);
+            $ticket = $this->Tickets->set($user['User']['email']);
+            $messageLink = 'https://'.$_SERVER['HTTP_HOST'].$this->webroot.$this->params['controller'].'/userRegisterConfirm/'.$ticket;
+            $cem = $this->CommonEmailMessage->findByName("email_verification_message");
+            $subject = $cem['CommonEmailMessage']['subject'];
+            $body = $cem['CommonEmailMessage']['body'];
+
+            return $this->sendEmail($user['User']['email'], $subject, $body.' '.$messageLink);
+        }
+        else {
+            $this->log("There was a problem with the contact form email process.  Not a Post.");
+            return false;
+        }
     }
 
-    private function sendEmailToNotifyOfNewUser($userId) {
+    private function sendEmailToNotifyOfNewUser($email) {
+        $contactUsEmail  = $this->SystemProperty->findByName("new_user_notification_email")['SystemProperty']['value'];
+
+        $cem = $this->CommonEmailMessage->findByName("new_user_notification_email");
+        $subject = $cem['CommonEmailMessage']['subject'];
+        $body = $cem['CommonEmailMessage']['body'];
+
+        return $this->sendEmail($contactUsEmail, $subject, $body.' '.$email);
     }
 
     private function setupUserSearchConditions($fnameFilter, $lnameFilter, $mroleFilter, $kfroleFilter, $tcroleFilter, $studioFilter, $statusFilter) {

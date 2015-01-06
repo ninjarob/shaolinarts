@@ -2,7 +2,7 @@
 <div style="float:right;">
     <?php echo $this->Html->link( "Back to Properties", array('controller'=>'systemProperties', 'action'=>'index'),array('escape' => false) ); ?>
 </div>
-<h3 style="clear:none;margin-top:0px;"><?php echo __('Edit SystemProperty'); ?></h3>
+<h3 style="clear:none;margin-top:0px;"><?php echo __('Edit Property'); ?></h3>
 <?php echo $this->Form->create('SystemProperty'); ?>
 <ul class="list-group">
     <?php echo $this->Session->flash('auth'); ?>

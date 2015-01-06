@@ -38,7 +38,12 @@ class StudentsController extends AppController {
 
     public function sendContactMessage() {
         $contactUsEmail  = $this->SystemProperty->findByName("contact_us_email")['SystemProperty']['value'];
-        $this->sendEmail($contactUsEmail, "Contact Form: ".$this->request->data['Contact']['subject'], $this->request->data['Contact']['body']);
+        if ($this->request->is('post')) {
+            $this->sendEmail($contactUsEmail, "Contact Form: ".$this->request->data['Contact']['subject'], $this->request->data['Contact']['body']);
+        }
+        else {
+            $this->log("There was a problem with the contact form email process.  Not a Post.");
+        }
         $this->Session->setFlash(__("Thankyou."), 'default', array('class'=>'flashmsg'));
         $this->redirect(array('controller'=>'pages', 'action' => 'contactUs'));
     }
