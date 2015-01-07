@@ -15,7 +15,7 @@ class UsersController extends AppController {
 
     public function beforeFilter() {
         parent::beforeFilter();
-        $this->Auth->allow('login','add','logout', 'forgot_password', 'resendEmailForNewUser','userRegisterConfirm');
+        $this->Auth->allow('login','add','logout', 'forgot_password', 'password_reset', 'resendEmailForNewUser','userRegisterConfirm', 'sendEmailForPasswordRenewal');
         $this->layout = 'user';
     }
 
@@ -327,70 +327,64 @@ class UsersController extends AppController {
     }
 
     public function forgot_password() {
-    }
-
-    // creates a ticket and sends an email
-    public function sendEmailForPasswordRenewal()
-    {
         if ($this->request->is('post')) {
-            if (!empty($this->params['data']))
+            if (is_array($this->params['data']))
             {
                 $user = $this->User->findByEmail($this->params['data']['User']['email']);
-
-                if(is_array($theUser) && is_array($theUser['User']))
+                if(is_array($user) && is_array($user['User']))
                 {
                     $ticket = $this->Tickets->set($user['User']['email']);
-                    $messageLink = 'https://'.$_SERVER['HTTP_HOST'].$this->webroot.$this->params['controller'].'/passwordReset/'.$ticket;
-                    $cem = $this->CommonEmailMessage->findByName("email_verification_message");
+                    $messageLink = 'https://'.$_SERVER['HTTP_HOST'].$this->webroot.$this->params['controller'].'/password_reset/'.$ticket;
+                    $cem = $this->CommonEmailMessage->findByName("reset_password_message");
                     $subject = $cem['CommonEmailMessage']['subject'];
                     $body = $cem['CommonEmailMessage']['body'];
 
                     $emailSent = $this->sendEmail($user['User']['email'], $subject, $body.' '.$messageLink);
-                    if ($mailSent) {
-                        $this->setFlashAndRedirect(Configure::read('User.passwordResetEmailSent'), 'forgot_password', false);
+                    if ($emailSent) {
+                        $this->setFlashAndRedirect(Configure::read('User.passwordResetEmailSent'), 'login', false);
                     }
                     else {
                         $this->rollBackAddUser();
-                        $this->setFlashAndRedirect(Configure::read('User.passwordResetEmailFailed'), 'forgot_password');
+                        $this->setFlashAndRedirect(Configure::read('User.passwordResetEmailFailed'), 'login');
                     }
                 }else{
                     // no user found for address
-                    $this->set('message', 'No user with that email address');
+                    $this->setFlashAndRedirect(Configure::read('User.passwordResetNoUserWithThatEmailAddress'), 'forgot_password');
                 }
             }
         }
     }
 
     // uses the ticket to reset the password for the correct user.
-    public function passwordReset($hash = null)
+    public function password_reset($hash = null)
     {
-        if ( $email = $this->Tickets->get($this->params['controller'], $hash) )
+        if ($email = $this->Tickets->get($hash))
         {
-            $authUser = $this->User->findByEmail($email);
-            if (is_array($authUser))
+            $user = $this->User->findByEmail($email);
+            if (is_array($user))
             {
-                if (!empty($this->params['data']))
+                $this->set('hash', $hash);
+                $this->set('id', $user['User']['id']);
+                if (isset($this->params['data']['User']))
                 {
-                    $theUser = $this->User->findById($this->params['data']['User']['id']);
-
                     if ($this->User->save($this->params['data']))
                     {
-                        $this->set('message', 'Your new password was saved.');
-                    }else{
-                        $this->set('message', 'User could not be saved');
+                        $this->Tickets->del($hash);
+                        $this->setFlashAndRedirect(Configure::read('User.passwordResetSuccess'), 'login', false);
+                    } else{
+
                     }
-                    $this->Tickets->del($hash);
-                    $this->redirect( '/' );
                 }
-                unset($authUser['User']['pass']);
-                $this->params['data'] = $authUser;
-                $this->render();
-                return;
+            }
+            else {
+                $this->Tickets->del($hash);
+                $this->setFlashAndRedirect(Configure::read('User.passwordResetErrorLoadingUser'), 'login');
             }
         }
-        $this->Tickets->del($hash);
-        $this->set('message', 'No hash provided');
-        $this->redirect('/');
+        else {
+            $this->Tickets->del($hash);
+            $this->setFlashAndRedirect(Configure::read('User.passwordResetInvalidHash'), 'login');
+        }
     }
 
     public function resendEmailForNewUser($userId) {

@@ -45,7 +45,7 @@ class TicketsComponent extends Component
         {
             $ticketObj = new Ticket();
             $data = $ticketObj->findByHash($ticket);
-            if ( is_array($data) && is_array($data['Ticket']) )
+            if ( is_array($data) && array_key_exists('Ticket', $data) && is_array($data['Ticket']) )
             {
                 return $data = $ticketObj->delete($data['Ticket']['id']);
             }

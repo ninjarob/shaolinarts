@@ -1,4 +1,4 @@
-<?php echo $this->Form->create('User', array('action'=>'sendEmailForPasswordRenewal')); ?>
+<?php echo $this->Form->create('User', array('action'=>'forgot_password')); ?>
 <h1>Forgot Password</h1>
 <br/>
 Enter the email address that you have on our files and we'll send you a link to reset your password.
@@ -8,8 +8,8 @@ Enter the email address that you have on our files and we'll send you a link to 
         <?php echo $this->Form->input('email', array('label'=>'')); ?>
     </li>
     <li class="input-group list-group-item">
-        <?php echo $this->Form->submit('Reset Password', array('div' => false,'class' => 'urclass', 'title' => 'Reset <Password></Password>')); ?>
+        <?php echo $this->Form->submit('Send', array('div' => false,'class' => 'urclass', 'title' => 'Reset Password')); ?>
     </li>
 </ul>
 <?php echo $this->Form->end(); ?>
-<script type="text/javascript">  $(document).ready(function() {    $('#UserUsername').focus();  });</script>
+<script type="text/javascript">  $(document).ready(function() {    $('#UserEmail').focus();  });</script>

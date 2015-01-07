@@ -132,8 +132,12 @@ Configure::write('User.loginFailed', 'There was a problem processing your login.
 Configure::write('User.loginFailedEmailReg', 'Pending email activation. Please look in your email inbox for an email with instructions to activate your account with ShaolinArts.com.');
 Configure::write('User.confirmRegistrationFailed', 'There was a problem confirming your user account. If the problem persists, please contact the system administrator.');
 
+Configure::write('User.passwordResetNoUserWithThatEmailAddress','There are no users in our system with that email address.');
 Configure::write('User.passwordResetEmailSent','An email has been sent to your account with a link to reset your password.');
 Configure::write('User.passwordResetEmailFailed','Unable to send the reset password email.  Please try again later.');
+Configure::write('User.passwordResetErrorLoadingUser','We were unable to load the user.  Please try again later.');
+Configure::write('User.passwordResetInvalidHash','There was a problem trying to reset the password.  Your token to reset your password may have expired.');
+Configure::write('User.passwordResetSuccess','Your new password was saved.  Please login using your new password.');
 
 Configure::write('Manual.generalProblem', 'There was a problem uploading the file.');
 Configure::write('Manual.typeProblem', 'Only the following file types are accepted (pdf, gif, jpeg, png).');
