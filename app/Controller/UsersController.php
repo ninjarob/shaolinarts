@@ -15,7 +15,7 @@ class UsersController extends AppController {
 
     public function beforeFilter() {
         parent::beforeFilter();
-        $this->Auth->allow('login','add','logout','resendEmailForNewUser','userRegisterConfirm');
+        $this->Auth->allow('login','add','logout', 'forgot_password', 'resendEmailForNewUser','userRegisterConfirm');
         $this->layout = 'user';
     }
 
@@ -56,7 +56,7 @@ class UsersController extends AppController {
                     if ($user['User']['status_id'] == 1) {
                         $resendLink = ' <a href="resendEmailForNewUser/'.$this->Auth->user('id').'" style="font-size:10px;">(Resend Email)</a>';
                         $this->Auth->logout();
-                        $this->setFlashAndRedirect(Configure::read('Manual.tooBig'), 'login', true, $resendLink);
+                        $this->setFlashAndRedirect(Configure::read('User.loginFailedEmailReg'), 'login', true, $resendLink);
                     }
                     else {
                         $this->Auth->logout();
@@ -326,42 +326,43 @@ class UsersController extends AppController {
         $this->setFlashAndRedirect(Configure::read('User.confirmRegistrationFailed'), 'login', true);
     }
 
+    public function forgot_password() {
+    }
+
     // creates a ticket and sends an email
     public function sendEmailForPasswordRenewal()
     {
-        if (!empty($this->params['data']))
-        {
-            $theUser = $this->User->findByEmail($this->params['data']['User']['email']);
-
-            if(is_array($theUser) && is_array($theUser['User']))
+        if ($this->request->is('post')) {
+            if (!empty($this->params['data']))
             {
-                $ticket = $this->Tickets->set($theUser['User']['email']);
+                $user = $this->User->findByEmail($this->params['data']['User']['email']);
 
-                $to      = $theUser['User']['email']; // users email
-                $subject = utf8_decode('Password reset information');
-                $message = 'http://'.$_SERVER['SERVER_NAME'].'/'.$this->params['controller'].'/password/'.$ticket;
-                $from    = 'noreply@shaolinarts.com';
-                $headers = 'From: ' . $from . "\r\n" .
-                   'Reply-To: ' . $from . "\r\n" .
-                   'X-Mailer: CakePHP PHP ' . phpversion(). "\r\n" .
-                   'Content-Type: text/plain; charset=ISO-8859-1';
-
-                if(mail($to, $subject, utf8_decode( sprintf($this->Lang->show('recover_email'), $message) ."\r\n"."\r\n" ), $headers))
+                if(is_array($theUser) && is_array($theUser['User']))
                 {
-                    $this->set('message', 'A recovery email was sent. Check your inbox.');
-                } else {
-                    // internal error, sorry
-                    $this->set('message', 'Server error, please try again later.');
+                    $ticket = $this->Tickets->set($user['User']['email']);
+                    $messageLink = 'https://'.$_SERVER['HTTP_HOST'].$this->webroot.$this->params['controller'].'/passwordReset/'.$ticket;
+                    $cem = $this->CommonEmailMessage->findByName("email_verification_message");
+                    $subject = $cem['CommonEmailMessage']['subject'];
+                    $body = $cem['CommonEmailMessage']['body'];
+
+                    $emailSent = $this->sendEmail($user['User']['email'], $subject, $body.' '.$messageLink);
+                    if ($mailSent) {
+                        $this->setFlashAndRedirect(Configure::read('User.passwordResetEmailSent'), 'forgot_password', false);
+                    }
+                    else {
+                        $this->rollBackAddUser();
+                        $this->setFlashAndRedirect(Configure::read('User.passwordResetEmailFailed'), 'forgot_password');
+                    }
+                }else{
+                    // no user found for address
+                    $this->set('message', 'No user with that email address');
                 }
-            }else{
-                // no user found for address
-                $this->set('message', 'No user with that email address');
             }
         }
     }
 
     // uses the ticket to reset the password for the correct user.
-    public function password($hash = null)
+    public function passwordReset($hash = null)
     {
         if ( $email = $this->Tickets->get($this->params['controller'], $hash) )
         {
@@ -407,21 +408,17 @@ class UsersController extends AppController {
             $this->log("User doesn't exist. ");
             return false;
         }
-        if ($this->request->is('post')) {
-            $user = $this->User->findById($userId);
 
-            $ticket = $this->Tickets->set($user['User']['email']);
-            $messageLink = 'https://'.$_SERVER['HTTP_HOST'].$this->webroot.$this->params['controller'].'/userRegisterConfirm/'.$ticket;
-            $cem = $this->CommonEmailMessage->findByName("email_verification_message");
-            $subject = $cem['CommonEmailMessage']['subject'];
-            $body = $cem['CommonEmailMessage']['body'];
+        $user = $this->User->findById($userId);
 
-            return $this->sendEmail($user['User']['email'], $subject, $body.' '.$messageLink);
-        }
-        else {
-            $this->log("There was a problem with the contact form email process.  Not a Post.");
-            return false;
-        }
+        $ticket = $this->Tickets->set($user['User']['email']);
+        $messageLink = 'https://'.$_SERVER['HTTP_HOST'].$this->webroot.$this->params['controller'].'/userRegisterConfirm/'.$ticket;
+        $cem = $this->CommonEmailMessage->findByName("email_verification_message");
+        $subject = $cem['CommonEmailMessage']['subject'];
+        $body = $cem['CommonEmailMessage']['body'];
+
+        return $this->sendEmail($user['User']['email'], $subject, $body.' '.$messageLink);
+
     }
 
     private function sendEmailToNotifyOfNewUser($email) {

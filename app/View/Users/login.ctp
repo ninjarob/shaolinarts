@@ -14,10 +14,10 @@
         <?php echo $this->Form->input('password', array('label'=>'')); ?>
     </li>
     <li class="input-group list-group-item">
-        <?php echo $this->Form->submit('Login', array('div' => false,'class' => 'urclass', 'title' => 'Title')); ?>
+        <?php echo $this->Form->submit('Login', array('div' => false,'class' => 'urclass', 'title' => 'Login')); ?>
     </li>
     <li class="input-group list-group-item">
-        <?php echo $this->Html->link('Did you forget your user name or password?', '/pages/passwordManagement') ?>
+        <?php echo $this->Html->link('Did you forget your user name or password?', '/users/forgot_password') ?>
     </li>
     <li class="input-group list-group-item">
         <a href="add" ajax="false">Is this the first time at the website?</a>
