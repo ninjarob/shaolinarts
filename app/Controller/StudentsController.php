@@ -46,6 +46,6 @@ class StudentsController extends AppController {
             $this->log("There was a problem with the contact form email process.  Not a Post.");
         }
         $this->Session->setFlash(__("Thankyou."), 'default', array('class'=>'flashmsg'));
-        $this->redirect(array('controller'=>'pages', 'action' => 'contactUs'));
+        $this->redirect(array('controller'=>'pages', 'action' => 'contact_us'));
     }
 }
