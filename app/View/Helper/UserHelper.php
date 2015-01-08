@@ -67,6 +67,9 @@ class UserHelper extends AppHelper {
     }
 
     private function isAdminForStudioRole($studioRole) {
-        return ($studioRole['UserRoleStudio']['role_id'] == 5);
+        if (isset($studioRole['UserRoleStudio'])) {
+            return ($studioRole['UserRoleStudio']['role_id'] == 5);
+        }
+        return false;
     }
 }
