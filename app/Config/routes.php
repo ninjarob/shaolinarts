@@ -36,6 +36,10 @@
  */
 	Router::connect('/pages/*', array('controller' => 'pages', 'action' => 'display'));
 
+    Router::redirect ('/sandy/karate/*', array('controller' => 'sandy', 'action' => 'kung_fu'));
+    Router::redirect ('/taylorsville/karate/*', array('controller' => 'taylorsville', 'action' => 'kung_fu'));
+    Router::redirect ('/glendale/karate/*', array('controller' => 'glendale', 'action' => 'kung_fu'));
+
 	Router::connect('/sandy/*', array('controller' => 'sandy', 'action' => 'display'));
 
 /**
