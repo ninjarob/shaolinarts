@@ -41,6 +41,8 @@
     Router::redirect ('/glendale/karate/*', array('controller' => 'glendale', 'action' => 'kung_fu'));
 
 	Router::connect('/sandy/*', array('controller' => 'sandy', 'action' => 'display'));
+	Router::connect('/taylorsville/*', array('controller' => 'taylorsville', 'action' => 'display'));
+	Router::connect('/glendale/*', array('controller' => 'glendale', 'action' => 'display'));
 
 /**
  * Load all plugin routes. See the CakePlugin documentation on
