@@ -74,8 +74,16 @@
             <div class="col-md-12">
                 <footer>
                     <p>
-                        (623) 581-2000 Glendale, AZ &bull; (801) 566-6364 Sandy, UT &bull; (801) 967-2300 Taylorsville,
-                        UT<br/>
+                        <?php if ($this->params->controller == "pages") { ?>
+                            (623) 581-2000 Glendale, AZ &bull; (801) 566-6364 Sandy, UT &bull; (801) 967-2300 Taylorsville, UT
+                        <?php } else if ($this->params->controller == "sandy") { ?>
+                            (801) 566-6364 Sandy, UT
+                        <?php } else if ($this->params->controller == "taylorsville") { ?>
+                            (801) 967-2300 Taylorsville, UT
+                        <?php } else if ($this->params->controller == "glendale"){ ?>
+                            (623) 581-2000 Glendale, AZ
+                        <?php } ?>
+                        <br/>
                         <small>&copy; Copyright 2010 - 2013 Shaolin Arts, LLC. All Rights Reserved.</small>
                     </p>
                 </footer>
