@@ -98,7 +98,7 @@ class AppController extends Controller {
      */
     function __forceSSL() {
        // if (strstr(env('SERVER_NAME'), 'www.')) {
-            $this->redirect('https://' . env('SERVER_NAME') . $this->here);
+         //   $this->redirect('https://' . env('SERVER_NAME') . $this->here);
         //} else {
          //   $this->redirect('https://www.' . env('SERVER_NAME') . $this->here);
         //}

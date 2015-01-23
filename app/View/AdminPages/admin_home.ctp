@@ -16,5 +16,8 @@
     <li class="input-group list-group-item">
         <?php echo $this->Html->link('Common Email Messages', '/commonEmailMessages') ?>
     </li>
+    <li class="input-group list-group-item">
+        <?php echo $this->Html->link('Office Tasks', '/admin_pages/office_tasks') ?>
+    </li>
     <?php }?>
 </ul>

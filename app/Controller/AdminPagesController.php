@@ -9,7 +9,7 @@ class AdminPagesController extends AppController {
     }
 
     public function isAuthorized($user) {
-        if (in_array($this->action, array('admin_home'))) {
+        if (in_array($this->action, array('admin_home', 'office_tasks'))) {
             $userRoleStudio = $this->UserRoleStudio->find('first', array('conditions'=>array('user_id'=>$user['id'], 'role_id = 5')));
             if (count($userRoleStudio)>0) {
                 return true;
@@ -19,6 +19,10 @@ class AdminPagesController extends AppController {
     }
 
     function admin_home() {
+
+    }
+
+    function office_tasks() {
 
     }
 }
