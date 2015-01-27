@@ -3,7 +3,7 @@ App::uses('AppController', 'Controller');
 App::import('Vendor', 'PhpMailer', array('file' => 'phpmailer' . DS . 'PHPMailerAutoload.php'));
 App::import('Helper', 'UserHelper');
 class UsersController extends AppController {
-    public $uses = array('User', 'UserInfo', 'Role', 'Studio', 'UserRoleStudio', 'Status', 'Ticket', 'Manual', 'SystemProperty', 'CommonEmailMessage');
+    public $uses = array('User', 'UserInfo', 'Role', 'Studio', 'UserRoleStudio', 'Status', 'Ticket', 'Manual', 'SystemProperty', 'CommonEmailMessage', 'Photo');
     var $components = array('Tickets'); //  use component email
 
     public $helpers = array('User','Js' => array('Jquery'));
@@ -227,6 +227,14 @@ class UsersController extends AppController {
         $user = $this->userIdProblems($id);
 
         $userRoleInfo = $this->UserRoleStudio->find('all', array('conditions'=>array('user_id'=>$user['User']['id'])));
+
+        //Photo stuff
+        $photo_id = $this->Photo->find('first', array('conditions'=>array('user_id'=>$id), 'fields' => array('id'),'order'=>'id ASC'));
+        $this->set('photoId', null);
+        if (isset($photo_id) && !empty($photo_id)) {
+            $this->set('photoId', $photo_id['Photo']['id']);
+        }
+
         $this->set("userRoleInfo", $userRoleInfo);
 
         if ($this->request->is('post') || $this->request->is('put')) {

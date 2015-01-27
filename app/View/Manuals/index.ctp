@@ -1,16 +1,18 @@
 <div class="manuals index">
-    <h3 style="clear:none;margin-top:0px;">Manual Management</h3>
+    <h3 style="clear:none;margin-top:0px;"><?php echo __('Manuals'); ?></h3>
     <div style="float:right;">
-        <?php echo $this->Html->link( "Back to Admin", array('controller'=>'admin_pages', 'action'=>'admin_home'),array('escape' => false) ); ?>
+        <?php echo $this->Html->link("Back to Admin", array('controller'=>'admin_pages', 'action'=>'admin_home'),array('escape' => false) ); ?>
     </div>
-    <?php echo $this->Html->link( "Add A New Manual", array('action'=>'add'),array('escape' => false) ); ?>
+    <?php echo $this->Html->link("Add A New Manual", array('action'=>'add'),array('escape' => false) ); ?>
+
+
 
     <table cellpadding="0" cellspacing="0" id="pattern-style-b">
 	<tr>
-			<th><?php echo $this->Paginator->sort('name'); ?></th>
-			<th><?php echo $this->Paginator->sort('description'); ?></th>
-			<th><?php echo $this->Paginator->sort('role_type_id'); ?></th>
-			<th class="actions"><?php echo __('Actions'); ?></th>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Role Type</th>
+        <th class="actions"><?php echo __('Actions'); ?></th>
 	</tr>
 	<?php foreach ($manuals as $manual): ?>
 	<tr>
@@ -29,19 +31,6 @@
 	</tr>
 <?php endforeach; ?>
 	</table>
-	<p>
-	<?php
-	echo $this->Paginator->counter(array(
-	'format' => __('Page {:page} of {:pages}, showing {:current} records out of {:count} total, starting on record {:start}, ending on {:end}')
-	));
-	?>	</p>
-	<div class="paging">
-	<?php
-		echo $this->Paginator->prev('< ' . __('previous'), array(), null, array('class' => 'prev disabled'));
-		echo $this->Paginator->numbers(array('separator' => ''));
-		echo $this->Paginator->next(__('next') . ' >', array(), null, array('class' => 'next disabled'));
-	?>
-	</div>
 </div>
 <br>
 <?php echo $this->Html->link( "Add A New Manual", array('action'=>'add'),array('escape' => false) ); ?>

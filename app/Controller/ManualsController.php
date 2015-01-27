@@ -33,20 +33,12 @@ class ManualsController extends AppController {
     }
 
 /**
- * Components
- *
- * @var array
- */
-	public $components = array('Paginator');
-
-/**
  * index method
  *
  * @return void
  */
 	public function index() {
-		$this->Manual->recursive = 0;
-		$this->set('manuals', $this->Paginator->paginate());
+        $this->set('manuals', $this->Manual->find('all'));
 	}
 
 /**
