@@ -1,3 +1,13 @@
+body {
+    font-family: Helvetica,Arial,sans-serif;
+    text-shadow: none !important;
+    font-weight: bold;
+    text-align: justify;
+}
+.navbar {
+background: -moz-linear-gradient(center top , #454545 0%, #242424 100%) repeat scroll 0 0 rgba(0, 0, 0, 0);
+}
+
 .login_label {
     display: block;
     float: left;

@@ -12,6 +12,7 @@
     <?php
         echo $this->Html->css('persistant');
         echo $this->Html->css('datepicker');
+        echo $this->Html->css('shaolinarts');
         echo $this->Html->script('jquery-1.11.1.min.js');
         echo $this->Html->script('jquery.fastLiveFilter.js');
         echo $this->Html->script('bootstrap.min.js');
