@@ -135,7 +135,7 @@ class AppController extends Controller {
             $roleTypes = array();
             $isAdmin = false;
             foreach ($userRoleStudios as $userRole) {
-                if ($userRole['Role']['id']==5) {
+                if ($userRole['Role']['id']==10) {
                     $isAdmin=true;
                     break;
                 }
@@ -161,7 +161,7 @@ class AppController extends Controller {
         if (count($userRoleStudios) >= 1) {
             $roleTypes = array();
             foreach ($userRoleStudios as $userRole) {
-                if ($userRole['Role']['id']==5) {
+                if ($userRole['Role']['id']==10) {
                     return true;
                 }
                 if ($userRole['Role']['role_type_id'] == $manualRoleType) {

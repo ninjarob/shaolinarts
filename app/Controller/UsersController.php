@@ -28,7 +28,7 @@ class UsersController extends AppController {
             if (in_array($this->action, array('learn', 'play', 'train', 'record', 'account'))) {
                 return true;
             }
-            $userRoleStudio = $this->UserRoleStudio->find('first', array('conditions'=>array('user_id'=>$user['id'], 'role_id = 5')));
+            $userRoleStudio = $this->UserRoleStudio->find('first', array('conditions'=>array('user_id'=>$user['id'], 'role_id = 10')));
             if (count($userRoleStudio)>0 && in_array($this->action, array('user_management', 'edit', 'delete', 'ajax_add_role', 'ajax_delete_role', 'activate', 'disable'))) {
                 return true;
             }
@@ -103,8 +103,8 @@ class UsersController extends AppController {
 
         $roles = $this->Role->find('list', array('fields' => array('id', 'name'),'order'=>'id ASC'));
         $mrRoleData = $this->Role->find('list', array('fields' => array('id', 'name'),/*'conditions'=>array('id in '),*/'order'=>'id ASC'));
-        $kfRankData = $this->KungFuRank->find('list', array('fields' => array('id', 'name'),/*'conditions'=>array('role_type_id in (2,3,4,8,9)'),*/'order'=>'id ASC'));
-        $tcRankData = $this->TaiChiRank->find('list', array('fields' => array('id', 'name'),/*'conditions'=>array('role_type_id in (5,6,7,10,11)'),*/'order'=>'id ASC'));
+        $kfRankData = $this->KungFuRank->find('list', array('fields' => array('id', 'name'),'order'=>'id ASC'));
+        $tcRankData = $this->TaiChiRank->find('list', array('fields' => array('id', 'name'),'order'=>'id ASC'));
         $studioData = $this->Studio->find('list', array('fields' => array('id', 'name'), 'order'=>'id ASC'));
         $statusData = $this->Status->find('list', array('fields' => array('id', 'name'), 'order'=>'id ASC'));
 
@@ -186,7 +186,7 @@ class UsersController extends AppController {
             if ($this->User->saveAll($this->request->data)) {
                 //checking admin rights
                 if($this->Session->check('Auth.User')){
-                    $userRoleStudio = $this->UserRoleStudio->find('first', array('conditions'=>array('user_id'=>$this->Session->read('Auth.User.id'), 'role_id in'=>array(1, 3, 4, 5))));
+                    $userRoleStudio = $this->UserRoleStudio->find('first', array('conditions'=>array('user_id'=>$this->Session->read('Auth.User.id'), 'role_id in'=>array(1, 3, 4, 10))));
                     if (count($userRoleStudio)>0) { //give role selected by manager
                         $newId = $this->User->id;
                         $ursData = array('User'=>array('id'=>$newId), 'Role'=>array('id'=>$this->request->data['Role']['id']), 'Studio'=>array('id'=>$this->request->data['Studio']['id']));
@@ -485,13 +485,13 @@ class UsersController extends AppController {
         if (count($userRoleStudios) >= 1) {
             foreach ($userRoleStudios as $urs) {
                 //catch admin
-                if ($urs['UserRoleStudio']['role_id'] == 5) return "admin";//"1,2,3";
+                if ($urs['UserRoleStudio']['role_id'] == 10) return "admin";//"1,2,3";
                 $studios = $studios.$urs['UserRoleStudio']['studio_id'].',';
             }
             $studios = rtrim($studios, ',');
         }
         else {
-            if ($userRoleStudios['UserRoleStudio']['role_id'] == 5) return "admin";//"1,2,3";
+            if ($userRoleStudios['UserRoleStudio']['role_id'] == 10) return "admin";//"1,2,3";
             $studios = $userRoleStudios['UserRoleStudio']['studio_id'];
         }
         return trim($studios);

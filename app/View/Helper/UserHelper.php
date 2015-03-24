@@ -29,7 +29,7 @@ class UserHelper extends AppHelper {
 
     private function isManagerForStudioRole($studioRole) {
         if (!isset($studioRole['UserRoleStudio'])) return false;
-        return ($studioRole['UserRoleStudio']['role_id'] <= 5 && $studioRole['UserRoleStudio']['role_id'] >= 3);
+        return ($studioRole['UserRoleStudio']['role_id'] <= 10 && $studioRole['UserRoleStudio']['role_id'] >= 3);
     }
 
     public function isInstructor($id) {
@@ -48,7 +48,7 @@ class UserHelper extends AppHelper {
     }
 
     private function isInstructorForStudioRole($studioRole) {
-        return ($studioRole['UserRoleStudio']['role_id'] <= 5 && $studioRole['UserRoleStudio']['role_id'] != 2);
+        return ($studioRole['UserRoleStudio']['role_id'] <= 10 && $studioRole['UserRoleStudio']['role_id'] != 2);
     }
 
     public function isAdmin($id) {
@@ -68,7 +68,7 @@ class UserHelper extends AppHelper {
 
     private function isAdminForStudioRole($studioRole) {
         if (isset($studioRole['UserRoleStudio'])) {
-            return ($studioRole['UserRoleStudio']['role_id'] == 5);
+            return ($studioRole['UserRoleStudio']['role_id'] == 10);
         }
         return false;
     }
