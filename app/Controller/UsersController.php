@@ -3,7 +3,7 @@ App::uses('AppController', 'Controller');
 App::import('Vendor', 'PhpMailer', array('file' => 'phpmailer' . DS . 'PHPMailerAutoload.php'));
 App::import('Helper', 'UserHelper');
 class UsersController extends AppController {
-    public $uses = array('User', 'UserInfo', 'Role', 'Studio', 'UserRoleStudio', 'Status', 'Ticket', 'Manual', 'SystemProperty', 'CommonEmailMessage', 'Photo');
+    public $uses = array('User', 'UserInfo', 'Role', 'Studio', 'UserRoleStudio', 'Status', 'Ticket', 'Manual', 'SystemProperty', 'CommonEmailMessage', 'Photo', 'KungFuRank', 'TaiChiRank');
     var $components = array('Tickets'); //  use component email
 
     public $helpers = array('User','Js' => array('Jquery'));
@@ -47,7 +47,7 @@ class UsersController extends AppController {
                 //$userRoleStudio = $this->UserRoleStudio->find('first', array('conditions'=>array('user_id'=>$this->Auth->user('id'))));
                 $user = $this->User->find('first', array('conditions'=>array('User.id'=>$this->Auth->user('id'))));
                 //if they have any roles, send them to the welcome
-                if (/*count($userRoleStudio)>0 && */$user['User']['status_id'] > 1) {
+                if (/*count($userRoleStudio)>0 && */$user['User']['status_id'] > 1 && $user['User']['status_id'] != 4) {
                     $this->Session->setFlash(__('Welcome, '. $this->Auth->user('email')), 'default', array('class'=>'flashmsg'));
                     $this->redirect($this->Auth->redirectUrl());
                 }
@@ -102,15 +102,15 @@ class UsersController extends AppController {
         }
 
         $roles = $this->Role->find('list', array('fields' => array('id', 'name'),'order'=>'id ASC'));
-        $mrRoleData = $this->Role->find('list', array('fields' => array('id', 'name'),'conditions'=>array('role_type_id'=>1),'order'=>'id ASC'));
-        $kfRoleData = $this->Role->find('list', array('fields' => array('id', 'name'),'conditions'=>array('role_type_id in (2,3,4,8,9)'),'order'=>'id ASC'));
-        $tcRoleData = $this->Role->find('list', array('fields' => array('id', 'name'),'conditions'=>array('role_type_id in (5,6,7,10,11)'),'order'=>'id ASC'));
+        $mrRoleData = $this->Role->find('list', array('fields' => array('id', 'name'),/*'conditions'=>array('id in '),*/'order'=>'id ASC'));
+        $kfRankData = $this->KungFuRank->find('list', array('fields' => array('id', 'name'),/*'conditions'=>array('role_type_id in (2,3,4,8,9)'),*/'order'=>'id ASC'));
+        $tcRankData = $this->TaiChiRank->find('list', array('fields' => array('id', 'name'),/*'conditions'=>array('role_type_id in (5,6,7,10,11)'),*/'order'=>'id ASC'));
         $studioData = $this->Studio->find('list', array('fields' => array('id', 'name'), 'order'=>'id ASC'));
         $statusData = $this->Status->find('list', array('fields' => array('id', 'name'), 'order'=>'id ASC'));
 
         $this->set('mrroles', $mrRoleData);
-        $this->set('kfroles', $kfRoleData);
-        $this->set('tcroles', $tcRoleData);
+        $this->set('kfranks', $kfRankData);
+        $this->set('tcranks', $tcRankData);
         $this->set('roles', $roles);
         $this->set('studios', $studioData);
         $this->set('statuses', $statusData);

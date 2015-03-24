@@ -55,7 +55,7 @@ class UserHelper extends AppHelper {
         App::import("Model", "UserRoleStudio");
         $model = new UserRoleStudio();
         $userRoleStudios = $model->find("all", array('conditions'=>array('user_id'=>$id)));
-        if (count($userRoleStudios) > 1) {
+        if (count($userRoleStudios) >= 1) {
             foreach ($userRoleStudios as $userRole) {
                 if ($this->isAdminForStudioRole($userRole)) return true;
             }

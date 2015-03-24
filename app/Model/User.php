@@ -5,7 +5,7 @@ class User extends AppModel {
 
     var $hasMany = array('UserRoleStudio' => array('foreignKey' => 'user_id', 'dependent'=>true));
     var $hasOne = array('UserInfo' => array('dependent'=>true), 'Photo'=>array('dependent'=>true));
-    var $belongsTo = 'Status';
+    var $belongsTo = array('Status', 'KungFuRank', 'TaiChiRank');
 
     public $validate = array(
         'email' => array(

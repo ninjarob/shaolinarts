@@ -31,8 +31,8 @@
             <td><?php echo $this->Form->input('fnfilter', array('label'=>'', 'style'=>'font-size:8px; width:50px; height:20px;')); ?></td>
             <td><?php echo $this->Form->input('lnfilter', array('label'=>'', 'style'=>'font-size:8px; width:50px; height:20px;')); ?></td>
             <td><?php echo $this->Form->input('mrfilter', array('empty'=>'Choose Manager Role', 'options' => $mrroles, 'label'=>'', 'style'=>'font-size:8px; width:150px; height:20px; white-space: nowrap;')); ?></td>
-            <td><?php echo $this->Form->input('kfrfilter', array('empty'=>'Choose Kung Fu Rank', 'options' => $kfroles, 'label'=>'', 'style'=>'font-size:8px; width:150px; height:20px;')); ?></td>
-            <td><?php echo $this->Form->input('tcrfilter', array('empty'=>'Choose Tai Chi Rank', 'options' => $tcroles, 'label'=>'', 'style'=>'font-size:8px; width:150px; height:20px;')); ?></td>
+            <td><?php echo $this->Form->input('kfrfilter', array('empty'=>'Choose Kung Fu Rank', 'options' => $kfranks, 'label'=>'', 'style'=>'font-size:8px; width:150px; height:20px;')); ?></td>
+            <td><?php echo $this->Form->input('tcrfilter', array('empty'=>'Choose Tai Chi Rank', 'options' => $tcranks, 'label'=>'', 'style'=>'font-size:8px; width:150px; height:20px;')); ?></td>
             <td><?php echo $this->Form->input('sfilter', array('empty'=>'Choose Studio', 'options' => $studios, 'label'=>'', 'style'=>'font-size:8px; width:150px; height:20px;')); ?></td>
             <td><?php echo $this->Form->input('statfilter', array('empty'=>'Choose Status', 'options' => $statuses, 'label'=>'', 'style'=>'font-size:8px; width:150px; height:20px;')); ?></td>
             <td><?php echo $this->Form->button('Clear', array('type'=>'reset', 'onclick'=>'clearSearchFilter();')); ?></td>
