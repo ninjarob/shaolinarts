@@ -167,8 +167,12 @@ class UsersController extends AppController {
         }
         $roleData = $this->Role->find('list', array('fields' => array('id', 'name'),'order'=>'id ASC'));
         $studioData = $this->Studio->find('list', array('fields' => array('id', 'name'),'order'=>'id ASC'));
+        $kungFuData = $this->KungFuRank->find('list', array('fields' => array('id', 'name'),'order'=>'id ASC'));
+        $taiChiData = $this->TaiChiRank->find('list', array('fields' => array('id', 'name'),'order'=>'id ASC'));
         $this->set('roles', $roleData);
         $this->set('studios', $studioData);
+        $this->set('kungFuRanks', $kungFuData);
+        $this->set('taiChiRanks', $taiChiData);
 
         if ($this->request->is('post')) {
             $this->User->create();
