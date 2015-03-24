@@ -50,12 +50,14 @@
         <tr>
             <th><?php echo $this->Paginator->sort('UserInfo.fname', 'First');?></th>
             <th><?php echo $this->Paginator->sort('UserInfo.lname', 'Last');?></th>
-            <th>Rank Role studio</th>
+            <th>Role</th>
+            <th><?php echo $this->Paginator->sort('KungFuRank.name', 'KF');?></th>
+            <th><?php echo $this->Paginator->sort('TaiChiRank.name', 'TC');?></th>
             <th style="white-space: nowrap;">Email/Phone</th>
             <th>Address</th>
             <th style="white-space: nowrap;">Spouse Guardian</th>
-            <th>Birthday</th>
-            <th>Status</th>
+            <th><?php echo $this->Paginator->sort('UserInfo.birthdate', 'Birthday');?></th>
+            <th><?php echo $this->Paginator->sort('Status.name', 'Status');?></th>
             <th><?php if ($this->User->isManager(AuthComponent::user('id'))) {  ?>Actions<?php } ?></th>
         </tr>
         </thead>
@@ -78,6 +80,12 @@
                         ?>
                     </div>
                 <?php } ?>
+            </td>
+            <td>
+                <?php echo $user['KungFuRank']['name']; ?>
+            </td>
+            <td>
+                <?php echo $user['TaiChiRank']['name']; ?>
             </td>
             <td style="font-size: 8px;">
                 <div style="white-space: nowrap;"><?php echo $user['User']['email']; ?></div>

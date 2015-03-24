@@ -174,6 +174,13 @@ class User extends AppModel {
             $this->data[$this->alias]['password'] = AuthComponent::password($this->data[$this->alias]['password_update']);
         }
 
+        if(empty($this->data['KungFuRank']['id'])){
+            $this->data['KungFuRank']['id']=null;
+        }
+        if(empty($this->data['TaiChiRank']['id'])){
+            $this->data['TaiChiRank']['id']=null;
+        }
+
         // fallback to our parent
         return parent::beforeSave($options);
     }

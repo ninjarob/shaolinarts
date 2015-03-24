@@ -128,7 +128,7 @@ class UsersController extends AppController {
                    )
                  )
              ),
-            'contain' => array('UserRoleStudio','UserInfo','Status'),
+            'contain' => array('UserRoleStudio','UserInfo','Status','KungFuRank','TaiChiRank'),
             'order' => array('UserInfo.fname' => 'asc' ),
             'group' => 'User.id',
             'conditions' => $conditions
@@ -221,8 +221,12 @@ class UsersController extends AppController {
         $this->layout = 'user_admin';
         $roleData = $this->Role->find('list', array('fields' => array('id', 'name'),'order'=>'id ASC'));
         $studioData = $this->Studio->find('list', array('fields' => array('id', 'name'),'order'=>'id ASC'));
+        $kungFuData = $this->KungFuRank->find('list', array('fields' => array('id', 'name'),'order'=>'id ASC'));
+        $taiChiData = $this->TaiChiRank->find('list', array('fields' => array('id', 'name'),'order'=>'id ASC'));
         $this->set('roles', $roleData);
         $this->set('studios', $studioData);
+        $this->set('kungFuRanks', $kungFuData);
+        $this->set('taiChiRanks', $taiChiData);
 
         $user = $this->userIdProblems($id);
 
@@ -246,6 +250,7 @@ class UsersController extends AppController {
                 $this->setFlashAndRedirect(Configure::read('User.editSuccess'), null, false);
                 $this->redirect(array('action' => 'edit', $id));
             }else{
+                $this->log($this->User->invalidFields());
                 $this->setFlashAndRedirect(Configure::read('User.editFailed'));
                 $this->redirect(array('action' => 'edit', $id));
             }
@@ -451,10 +456,10 @@ class UsersController extends AppController {
             $conditions[]="UserRoleStudio.role_id = ".$mroleFilter;
         }
         if (!empty($kfroleFilter)) {
-            $conditions[]="UserRoleStudio.role_id = ".$kfroleFilter;
+            $conditions[]="KungFuRank.id = ".$kfroleFilter;
         }
         if (!empty($tcroleFilter)) {
-            $conditions[]="UserRoleStudio.role_id = ".$tcroleFilter;
+            $conditions[]="TaiChiRank.id = ".$tcroleFilter;
         }
         if (!empty($studioFilter)) {
             $conditions[]="UserRoleStudio.studio_id = ".$studioFilter;

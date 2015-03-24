@@ -29,6 +29,16 @@
                 <?php echo $this->Form->input('email', array('label'=>'', 'maxLength' => 100, 'title' => 'Email')); ?>
             </li>
             <li class="input-group list-group-item">
+                <label class="login_label">Kung Fu Rank:</label>
+                <?php echo $this->Form->input('KungFuRank.id', array('options' => $kungFuRanks, 'label'=>'')); ?>
+                <?php echo $this->Form->input('kung_fu_rank_date', array('dateFormat'=>'DMY', 'minYear'=>date('Y')-110, 'maxYear'=>date('Y')-3+1, 'empty'=>array('- -'), 'maxLength' => 32, 'title' => 'Kung Fu Rank Date', 'label'=>'')); ?>
+            </li>
+            <li class="input-group list-group-item">
+                <label class="login_label">TaiChi Rank:</label>
+                <?php echo $this->Form->input('TaiChiRank.id', array('options' => $taiChiRanks, 'label'=>'')); ?>
+                <?php echo $this->Form->input('tai_chi_rank_date', array('dateFormat'=>'DMY', 'minYear'=>date('Y')-110, 'maxYear'=>date('Y')-3+1, 'empty'=>array('- -'), 'maxLength' => 32, 'title' => 'Tai Chi Rank Date', 'label'=>'')); ?>
+            </li>
+            <li class="input-group list-group-item">
                 <label class="login_label">Home Phone:</label>
                 <?php echo $this->Form->input('UserInfo.homephone', array('label'=>'', 'maxLength' => 32, 'title' => 'Home Phone')); ?>
             </li>
@@ -56,8 +66,6 @@
                 <label class="login_label">Zip:</label>
                 <?php echo $this->Form->input('UserInfo.zip', array('label'=>'', 'maxLength' => 32, 'title' => 'Zip')); ?>
             </li>
-
-
             <li class="input-group list-group-item">
                 <label class="login_label">Birth Date:</label>
                 <?php echo $this->Form->input('UserInfo.birthdate', array('dateFormat'=>'DMY', 'minYear'=>date('Y')-110, 'maxYear'=>date('Y')-3+1, 'empty'=>array('- -'), 'maxLength' => 32, 'title' => 'Birth Date', 'label'=>'')); ?>
